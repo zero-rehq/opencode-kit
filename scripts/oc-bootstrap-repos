@@ -1,0 +1,95 @@
+#!/usr/bin/env bash
+set -euo pipefail
+source "$(cd "$(dirname "$(realpath "${BASH_SOURCE[0]}")")" && pwd)/lib.sh"
+
+FORCE=0
+MAKE_SERVICE=0
+for arg in "$@"; do
+  case "$arg" in
+    --force) FORCE=1 ;;
+    --service-yaml) MAKE_SERVICE=1 ;;
+    *) echo "Unknown arg: $arg" >&2; exit 2 ;;
+  esac
+done
+
+IFS="|" read -r SCRIPT_DIR KIT_ROOT WORKSPACE_ROOT <<<"$(oc_paths)"
+PY_RENDER="$SCRIPT_DIR/render_template.py"
+
+REPOS="$("$SCRIPT_DIR/oc-repos" "$WORKSPACE_ROOT" || true)"
+[[ -n "$REPOS" ]] || { echo "No repos detected under: $WORKSPACE_ROOT"; exit 0; }
+
+tmpl_agents="$KIT_ROOT/templates/repo/AGENTS.md.tmpl"
+tmpl_service="$KIT_ROOT/templates/repo/service.yaml.tmpl"
+
+detect_stack() {
+  local stack="Unknown" runner="N/A"
+  local install="(fill)" dev="(fill)" test="(fill)" lint="(fill)" build="(fill)"
+
+  if [[ -f package.json ]]; then
+    stack="Node.js/TypeScript"; runner="npm"
+    [[ -f pnpm-lock.yaml ]] && runner="pnpm"
+    [[ -f yarn.lock ]] && runner="yarn"
+    [[ -f bun.lockb ]] && runner="bun"
+    install="$runner install"
+    dev="$runner run dev"
+    test="$runner run test"
+    lint="$runner run lint"
+    build="$runner run build"
+  elif [[ -f go.mod ]]; then
+    stack="Go"; runner="go"
+    install="go mod download"; dev="go run ./..."; test="go test ./..."; lint="gofmt -w ."; build="go build ./..."
+  elif [[ -f pyproject.toml || -f requirements.txt ]]; then
+    stack="Python"; runner="python/pip"
+    install="python -m pip install -r requirements.txt (or poetry install)"
+    dev="python -m <module> (fill)"; test="python -m pytest"; lint="ruff check . / black ."; build="python -m build"
+  fi
+
+  printf "%s|%s|%s|%s|%s|%s|%s" "$stack" "$runner" "$install" "$dev" "$test" "$lint" "$build"
+}
+
+apply_template() {
+  python3 "$PY_RENDER" \
+    --template "$1" --out "$2" \
+    --var "REPO_NAME=$3" \
+    --var "REPO_PATH=$4" \
+    --var "STACK=$5" \
+    --var "RUNNER=$6" \
+    --var "INSTALL_CMD=$7" \
+    --var "DEV_CMD=$8" \
+    --var "TEST_CMD=$9" \
+    --var "LINT_CMD=${10}" \
+    --var "BUILD_CMD=${11}"
+}
+
+created=0; skipped=0
+
+while IFS= read -r repo; do
+  [[ -z "$repo" ]] && continue
+  [[ -d "$repo/.git" ]] || continue
+
+  repo_rel="${repo#"$WORKSPACE_ROOT"/}"
+  repo_name="$(basename "$repo")"
+  agents_path="$repo/AGENTS.md"
+  service_path="$repo/service.yaml"
+
+  pushd "$repo" >/dev/null
+  IFS="|" read -r stack runner install dev test lint build <<<"$(detect_stack)"
+  popd >/dev/null
+
+  if [[ -f "$agents_path" && "$FORCE" -ne 1 ]]; then
+    skipped=$((skipped+1))
+  else
+    apply_template "$tmpl_agents" "$agents_path" "$repo_name" "$repo_rel" "$stack" "$runner" "$install" "$dev" "$test" "$lint" "$build"
+    created=$((created+1))
+  fi
+
+  if [[ "$MAKE_SERVICE" -eq 1 ]]; then
+    if [[ -f "$service_path" && "$FORCE" -ne 1 ]]; then
+      :
+    else
+      apply_template "$tmpl_service" "$service_path" "$repo_name" "$repo_rel" "$stack" "$runner" "$install" "$dev" "$test" "$lint" "$build"
+    fi
+  fi
+done <<< "$REPOS"
+
+echo "Done. AGENTS.md created/updated: $created, skipped: $skipped"

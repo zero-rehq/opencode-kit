@@ -1,0 +1,64 @@
+#!/usr/bin/env bash
+set -euo pipefail
+source "$(cd "$(dirname "$(realpath "${BASH_SOURCE[0]}")")" && pwd)/lib.sh"
+IFS="|" read -r SCRIPT_DIR KIT_ROOT WORKSPACE_ROOT <<<"$(oc_paths)"
+
+TASK="${1:-}"; [[ -n "$TASK" ]] || { echo "Usage: oc-snapshot <task>"; exit 1; }
+DATE="$(date +%F)"
+
+LOGDIR="$WORKSPACE_ROOT/worklog"; mkdir -p "$LOGDIR"
+LOGFILE="$LOGDIR/${DATE}_${TASK}.md"
+
+TARGETS_FILE="$WORKSPACE_ROOT/.opencode/targets/${DATE}_${TASK}.txt"
+[[ -f "$TARGETS_FILE" ]] || { echo "Targets file not found: $TARGETS_FILE"; exit 2; }
+
+if [[ ! -f "$LOGFILE" ]]; then
+  cat > "$LOGFILE" <<EOF
+# Task: ${TASK}
+Date: ${DATE}
+
+## Goal
+- (fill)
+
+## Repos touched (targets)
+- (fill)
+
+## Timeline
+EOF
+fi
+
+{
+  echo ""
+  echo "### Snapshot ($(date -Is))"
+  echo ""
+} >> "$LOGFILE"
+
+REPOS="$(grep -vE '^\s*#' "$TARGETS_FILE" | sed '/^\s*$/d' || true)"
+[[ -n "$REPOS" ]] || { echo "- No targets set yet in $TARGETS_FILE" >> "$LOGFILE"; exit 0; }
+
+while IFS= read -r repo; do
+  [[ -z "$repo" ]] && continue
+  local_path="$WORKSPACE_ROOT/$repo"
+  [[ -d "$local_path/.git" ]] || { echo "- Skipping non-repo target: $repo" >> "$LOGFILE"; continue; }
+
+  {
+    echo ""
+    echo "#### Repo: \`$repo\`"
+    echo ""
+  } >> "$LOGFILE"
+
+  pushd "$local_path" >/dev/null
+  BRANCH="$(git rev-parse --abbrev-ref HEAD 2>/dev/null || echo unknown)"
+  {
+    echo "- Branch: \`$BRANCH\`"
+    echo "- Status:"
+    echo '```'
+    git status -sb || true
+    echo '```'
+    echo "- Diffstat:"
+    echo '```'
+    git diff --stat || true
+    echo '```'
+  } >> "$LOGFILE"
+  popd >/dev/null
+done <<< "$REPOS"

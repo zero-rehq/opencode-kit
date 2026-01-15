@@ -1,0 +1,15 @@
+#!/usr/bin/env bash
+set -euo pipefail
+ROOT="${1:-.}"
+MAXDEPTH="${OC_REPO_MAXDEPTH:-4}"
+
+repos=()
+while IFS= read -r -d '' gitdir; do
+  repos+=("$(dirname "$gitdir")")
+done < <(find "$ROOT" -maxdepth "$MAXDEPTH" -mindepth 1 -type d -name ".git" -print0 2>/dev/null || true)
+
+if [[ "${#repos[@]}" -eq 0 ]]; then
+  exit 0
+fi
+
+printf "%s\n" "${repos[@]}" | sort -u

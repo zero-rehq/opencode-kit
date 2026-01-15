@@ -1,0 +1,15 @@
+#!/usr/bin/env bash
+set -euo pipefail
+
+source "$(cd "$(dirname "$(realpath "${BASH_SOURCE[0]}")")" && pwd)/lib.sh"
+IFS="|" read -r SCRIPT_DIR KIT_ROOT WORKSPACE_ROOT <<<"$(oc_paths)"
+
+TASK="${1:-}"; [[ -n "$TASK" ]] || { echo "Usage: oc-gate <task>"; exit 1; }
+
+# 1) No-any first (fast fail)
+"$SCRIPT_DIR/oc-no-any" "$TASK"
+
+# 2) CI best-effort on targets
+"$SCRIPT_DIR/oc-run-ci" "$TASK"
+
+echo "Gate done. See worklog/*_ci_${TASK}.md"

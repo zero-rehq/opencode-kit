@@ -1,0 +1,67 @@
+#!/usr/bin/env bash
+set -euo pipefail
+source "$(cd "$(dirname "$(realpath "${BASH_SOURCE[0]}")")" && pwd)/lib.sh"
+IFS="|" read -r SCRIPT_DIR KIT_ROOT WORKSPACE_ROOT <<<"$(oc_paths)"
+
+TASK="${1:-}"; [[ -n "$TASK" ]] || { echo "Usage: oc-run-ci <task>"; exit 1; }
+DATE="$(date +%F)"
+LOGDIR="$WORKSPACE_ROOT/worklog"; mkdir -p "$LOGDIR"
+LOGFILE="$LOGDIR/${DATE}_ci_${TASK}.md"
+
+TARGETS_FILE="$WORKSPACE_ROOT/.opencode/targets/${DATE}_${TASK}.txt"
+[[ -f "$TARGETS_FILE" ]] || { echo "Targets file not found: $TARGETS_FILE"; exit 2; }
+
+{
+  echo "# CI run for task: $TASK ($(date -Is))"
+  echo ""
+} > "$LOGFILE"
+
+has_script() {
+  local s="$1"
+  command -v node >/dev/null 2>&1 || return 1
+  node -e "const p=require('./package.json'); process.exit(p.scripts && p.scripts['$s'] ? 0 : 1)" >/dev/null 2>&1
+}
+
+REPOS="$(grep -vE '^\s*#' "$TARGETS_FILE" | sed '/^\s*$/d' || true)"
+[[ -n "$REPOS" ]] || { echo "- No targets set." >> "$LOGFILE"; exit 0; }
+
+while IFS= read -r repo; do
+  [[ -z "$repo" ]] && continue
+  local_path="$WORKSPACE_ROOT/$repo"
+  {
+    echo ""
+    echo "## Repo: $repo"
+    echo ""
+  } >> "$LOGFILE"
+
+  [[ -d "$local_path/.git" ]] || { echo "- Not a repo. Skipping." >> "$LOGFILE"; continue; }
+
+  pushd "$local_path" >/dev/null
+  if [[ -f package.json ]]; then
+    RUNNER="npm"
+    [[ -f pnpm-lock.yaml ]] && RUNNER="pnpm"
+    [[ -f yarn.lock ]] && RUNNER="yarn"
+    [[ -f bun.lockb ]] && RUNNER="bun"
+
+    echo "- Node project (runner: $RUNNER)" >> "$LOGFILE"
+
+    for s in lint typecheck test build; do
+      echo "" >> "$LOGFILE"
+      echo "### $s" >> "$LOGFILE"
+      echo "" >> "$LOGFILE"
+      if has_script "$s"; then
+        echo '```' >> "$LOGFILE"
+        $RUNNER run "$s" >> "$LOGFILE" 2>&1 || echo "(failed)" >> "$LOGFILE"
+        echo '```' >> "$LOGFILE"
+      else
+        echo "- script '$s' not found" >> "$LOGFILE"
+      fi
+    done
+  else
+    echo "- No package.json. Extend oc-run-ci for this repo type if needed." >> "$LOGFILE"
+  fi
+  popd >/dev/null
+done <<< "$REPOS"
+
+echo "" >> "$LOGFILE"
+echo "Done." >> "$LOGFILE"

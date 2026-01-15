@@ -1,0 +1,101 @@
+#!/usr/bin/env bash
+set -euo pipefail
+source "$(cd "$(dirname "$(realpath "${BASH_SOURCE[0]}")")" && pwd)/lib.sh"
+
+cmd="${1:-}"
+task="${2:-}"
+[[ -n "$cmd" && -n "$task" ]] || { echo "Usage: oc-targets <init|set|show|auto> <task> [args]"; exit 1; }
+
+IFS="|" read -r SCRIPT_DIR KIT_ROOT WORKSPACE_ROOT <<<"$(oc_paths)"
+DATE="$(date +%F)"
+TARGET_DIR="$WORKSPACE_ROOT/.opencode/targets"
+mkdir -p "$TARGET_DIR"
+TARGET_FILE="$TARGET_DIR/${DATE}_${task}.txt"
+
+init() {
+  if [[ ! -f "$TARGET_FILE" ]]; then
+    cat > "$TARGET_FILE" <<EOF
+# Targets for task: ${task}
+# Date: ${DATE}
+# One repo path per line (relative to workspace root).
+EOF
+  fi
+  echo "$TARGET_FILE"
+}
+
+show() {
+  [[ -f "$TARGET_FILE" ]] || { echo "Targets not initialized. Run: oc-targets init \"$task\"" >&2; exit 2; }
+  grep -vE '^\s*#' "$TARGET_FILE" | sed '/^\s*$/d' || true
+}
+
+set_targets() {
+  shift 2
+  [[ "$#" -ge 1 ]] || { echo "Provide at least 1 repo path." >&2; exit 2; }
+  init >/dev/null
+  {
+    grep -E '^\s*#' "$TARGET_FILE" || true
+    for r in "$@"; do echo "$r"; done
+  } > "${TARGET_FILE}.tmp"
+  mv "${TARGET_FILE}.tmp" "$TARGET_FILE"
+  echo "Set targets in: $TARGET_FILE"
+}
+
+find_repo_root_for_path() {
+  local p="$1"
+  local d
+  d="$(dirname "$p")"
+  while [[ "$d" != "." && "$d" != "/" ]]; do
+    if [[ -d "$WORKSPACE_ROOT/$d/.git" ]]; then
+      echo "$d"
+      return 0
+    fi
+    d="$(dirname "$d")"
+  done
+  return 1
+}
+
+auto() {
+  shift 2
+  [[ "$#" -ge 1 ]] || { echo "Provide a search query."; exit 2; }
+  init >/dev/null
+  local query="$*"
+  local hits tmp
+  hits="$(mktemp)"
+  tmp="$(mktemp)"
+  trap 'rm -f "$hits" "$tmp"' EXIT
+
+  pushd "$WORKSPACE_ROOT" >/dev/null
+  if command -v rg >/dev/null 2>&1; then
+    rg -n --no-heading --hidden --glob '!.git/*' "$query" . > "$hits" || true
+  else
+    grep -RIn --exclude-dir=.git --exclude-dir=node_modules --exclude-dir=dist --exclude-dir=build "$query" . > "$hits" || true
+  fi
+  popd >/dev/null
+
+  [[ -s "$hits" ]] || { echo "No matches for: $query"; exit 0; }
+
+  while IFS= read -r line; do
+    file="${line%%:*}"; file="${file#./}"
+    [[ -f "$WORKSPACE_ROOT/$file" ]] || continue
+    root="$(find_repo_root_for_path "$file" || true)"
+    [[ -n "$root" ]] && echo "$root" >> "$tmp"
+  done < "$hits"
+
+  [[ -s "$tmp" ]] || { echo "Matches found but no repo roots detected."; exit 0; }
+
+  {
+    grep -E '^\s*#' "$TARGET_FILE" || true
+    sort -u "$tmp"
+  } > "${TARGET_FILE}.tmp"
+  mv "${TARGET_FILE}.tmp" "$TARGET_FILE"
+  echo "Auto targets set: $TARGET_FILE"
+  show
+}
+
+case "$cmd" in
+  init) init ;;
+  show) show ;;
+  set) set_targets "$@" ;;
+  auto) auto "$@" ;;
+  *) echo "Unknown cmd: $cmd" >&2; exit 2 ;;
+esac

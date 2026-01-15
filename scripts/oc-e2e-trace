@@ -1,0 +1,31 @@
+#!/usr/bin/env bash
+set -euo pipefail
+
+source "$(cd "$(dirname "$(realpath "${BASH_SOURCE[0]}")")" && pwd)/lib.sh"
+IFS="|" read -r SCRIPT_DIR KIT_ROOT WORKSPACE_ROOT <<<"$(oc_paths)"
+
+TASK="${1:-}"; [[ -n "$TASK" ]] || { echo "Usage: oc-e2e-trace <task>"; exit 1; }
+DATE="$(date +%F)"
+LOGDIR="$WORKSPACE_ROOT/worklog"; mkdir -p "$LOGDIR"
+WORKLOG="$LOGDIR/${DATE}_${TASK}.md"
+
+if [[ ! -f "$WORKLOG" ]]; then
+  echo "Worklog not found: $WORKLOG (run oc-snapshot <task> first)" >&2
+  exit 2
+fi
+
+{
+  echo ""
+  echo "## E2E_TRACE"
+  echo "- Entry (UI): <pantalla/componente/acción>"
+  echo "- Repo UI: <repo> (paths clave)"
+  echo "- Request: <METHOD URL> <headers> <payload>"
+  echo "- Backend: <repo/servicio> (handler/controlador)"
+  echo "- Data: <db/table/queue/cache> (migraciones si aplica)"
+  echo "- Response: <shape> (status codes/errores)"
+  echo "- UI render: <qué se ve/cambia>"
+  echo "- Verified: <pasos manuales> + <comandos>"
+  echo ""
+} >> "$WORKLOG"
+
+echo "Inserted E2E_TRACE template into: $WORKLOG"

@@ -1,0 +1,31 @@
+#!/usr/bin/env bash
+set -euo pipefail
+
+source "$(cd "$(dirname "$(realpath "${BASH_SOURCE[0]}")")" && pwd)/lib.sh"
+IFS="|" read -r SCRIPT_DIR KIT_ROOT WORKSPACE_ROOT <<<"$(oc_paths)"
+
+TASK="${1:-}"; [[ -n "$TASK" ]] || { echo "Usage: oc-jira-note <task>"; exit 1; }
+DATE="$(date +%F)"
+LOGDIR="$WORKSPACE_ROOT/worklog"; mkdir -p "$LOGDIR"
+WORKLOG="$LOGDIR/${DATE}_${TASK}.md"
+OUT="$LOGDIR/${DATE}_jira_${TASK}.txt"
+
+[[ -f "$WORKLOG" ]] || { echo "Worklog not found: $WORKLOG" >&2; exit 2; }
+
+# Minimal extraction: last 120 lines tend to contain wrap-up/summary.
+# You can refine later; the @scribe agent usually produces the final Jira comment.
+{
+  echo "Jira comment (task: $TASK)"
+  echo "Date: $DATE"
+  echo ""
+  echo "Resumen (copiar/pegar):"
+  echo "- Implementación en repos targets (ver worklog)."
+  echo "- Gates/CI: worklog/${DATE}_ci_${TASK}.md"
+  echo "- no-any: worklog/${DATE}_no-any_${TASK}.md"
+  echo "- E2E_TRACE: ver sección en worklog (si aplica)."
+  echo ""
+  echo "---"
+  tail -n 120 "$WORKLOG" || true
+} > "$OUT"
+
+echo "Wrote Jira note: $OUT"

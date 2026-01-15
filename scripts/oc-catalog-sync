@@ -1,0 +1,37 @@
+#!/usr/bin/env bash
+set -euo pipefail
+source "$(cd "$(dirname "$(realpath "${BASH_SOURCE[0]}")")" && pwd)/lib.sh"
+IFS="|" read -r SCRIPT_DIR KIT_ROOT WORKSPACE_ROOT <<<"$(oc_paths)"
+
+CATALOG="$KIT_ROOT/catalog/services.yaml"
+TMP="$(mktemp)"
+
+{
+  echo "# Service catalog (auto-generated)"
+  echo "# Generated: $(date -Is)"
+  echo ""
+  echo "services:"
+} > "$TMP"
+
+count=0
+REPOS="$("$SCRIPT_DIR/oc-repos" "$WORKSPACE_ROOT" || true)"
+while IFS= read -r repo; do
+  [[ -z "$repo" ]] && continue
+  f="$repo/service.yaml"
+  if [[ -f "$f" ]]; then
+    name="$(grep -E '^name:\s*' "$f" | head -n1 | sed 's/^name:\s*//')"
+    [[ -z "$name" ]] && name="$(basename "$repo")"
+    {
+      echo "  - name: $name"
+      echo "    repo: ${repo#"$WORKSPACE_ROOT"/}"
+      echo "    owners: []"
+      echo "    provides: { apis: [], topics: [], libraries: [] }"
+      echo "    depends_on: []"
+    } >> "$TMP"
+    count=$((count+1))
+  fi
+done <<< "$REPOS"
+
+mkdir -p "$(dirname "$CATALOG")"
+mv "$TMP" "$CATALOG"
+echo "Wrote $CATALOG with $count service(s)."

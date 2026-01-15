@@ -1,0 +1,44 @@
+#!/usr/bin/env bash
+set -euo pipefail
+source "$(cd "$(dirname "$(realpath "${BASH_SOURCE[0]}")")" && pwd)/lib.sh"
+IFS="|" read -r SCRIPT_DIR KIT_ROOT WORKSPACE_ROOT <<<"$(oc_paths)"
+
+TASK="${1:-}"; [[ -n "$TASK" ]] || { echo "Usage: oc-wrap <task>"; exit 1; }
+DATE="$(date +%F)"
+LOGFILE="$WORKSPACE_ROOT/worklog/${DATE}_${TASK}.md"
+TARGETS_FILE="$WORKSPACE_ROOT/.opencode/targets/${DATE}_${TASK}.txt"
+
+[[ -f "$TARGETS_FILE" ]] || { echo "Targets file not found: $TARGETS_FILE"; exit 2; }
+[[ -f "$LOGFILE" ]] || { echo "Worklog not found: $LOGFILE (run oc-snapshot first)"; exit 1; }
+
+{
+  echo ""
+  echo "## Wrap-up ($(date -Is))"
+  echo ""
+  echo "- CI report: \`worklog/${DATE}_ci_${TASK}.md\`"
+  echo ""
+} >> "$LOGFILE"
+
+"$SCRIPT_DIR/oc-snapshot" "$TASK" >/dev/null 2>&1 || true
+
+{
+  echo ""
+  echo "### Commits (per target repo)"
+  echo ""
+} >> "$LOGFILE"
+
+REPOS="$(grep -vE '^\s*#' "$TARGETS_FILE" | sed '/^\s*$/d' || true)"
+while IFS= read -r repo; do
+  [[ -z "$repo" ]] && continue
+  local_path="$WORKSPACE_ROOT/$repo"
+  [[ -d "$local_path/.git" ]] || continue
+  pushd "$local_path" >/dev/null
+  {
+    echo ""
+    echo "#### $repo"
+    echo '```'
+    git --no-pager log --oneline -n 15 || true
+    echo '```'
+  } >> "$LOGFILE"
+  popd >/dev/null
+done <<< "$REPOS"

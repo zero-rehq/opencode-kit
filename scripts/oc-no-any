@@ -1,0 +1,75 @@
+#!/usr/bin/env bash
+set -euo pipefail
+
+source "$(cd "$(dirname "$(realpath "${BASH_SOURCE[0]}")")" && pwd)/lib.sh"
+IFS="|" read -r SCRIPT_DIR KIT_ROOT WORKSPACE_ROOT <<<"$(oc_paths)"
+
+TASK="${1:-}"; [[ -n "$TASK" ]] || { echo "Usage: oc-no-any <task>"; exit 1; }
+DATE="$(date +%F)"
+TARGETS_FILE="$WORKSPACE_ROOT/.opencode/targets/${DATE}_${TASK}.txt"
+LOGDIR="$WORKSPACE_ROOT/worklog"; mkdir -p "$LOGDIR"
+REPORT="$LOGDIR/${DATE}_no-any_${TASK}.md"
+WORKLOG="$LOGDIR/${DATE}_${TASK}.md"
+
+[[ -f "$TARGETS_FILE" ]] || { echo "Targets file not found: $TARGETS_FILE"; exit 2; }
+
+# Patterns for explicit TypeScript any usage
+PATTERN='(:\\s*any\\b|\\bas\\s+any\\b|<\\s*any\\s*>|\\bany\\s*\\[\\s*\\]|Record<[^>]*,\\s*any\\s*>|\\bany\\b)'
+
+has_rg=0
+command -v rg >/dev/null 2>&1 && has_rg=1
+
+{
+  echo "# no-any report for task: $TASK"
+  echo "Date: $DATE"
+  echo ""
+  echo "Regla: evitar `any` en TypeScript. Si aparece en libs externas o genéricos inevitables, documenta razón y alternativa (preferir unknown + narrowing)."
+  echo ""
+} > "$REPORT"
+
+found=0
+REPOS="$(grep -vE '^\\s*#' "$TARGETS_FILE" | sed '/^\\s*$/d' || true)"
+
+while IFS= read -r repo; do
+  [[ -z "$repo" ]] && continue
+  local_path="$WORKSPACE_ROOT/$repo"
+  [[ -d "$local_path/.git" ]] || { echo "## Repo: $repo\n\n- Not a repo. Skipping.\n" >> "$REPORT"; continue; }
+
+  echo "## Repo: $repo" >> "$REPORT"
+  echo "" >> "$REPORT"
+
+  pushd "$local_path" >/dev/null
+  if [[ $has_rg -eq 1 ]]; then
+    # Avoid node_modules/dist/build/.git; include only ts/tsx
+    hits="$(rg -n --hidden --glob '!.git/*' --glob '!**/node_modules/**' --glob '!**/dist/**' --glob '!**/build/**' --glob '!**/coverage/**' --glob '*.ts' --glob '*.tsx' -e "$PATTERN" . || true)"
+  else
+    hits="$(grep -RIn --exclude-dir=.git --exclude-dir=node_modules --exclude-dir=dist --exclude-dir=build --include='*.ts' --include='*.tsx' -E "${PATTERN}" . 2>/dev/null || true)"
+  fi
+  popd >/dev/null
+
+  if [[ -n "$hits" ]]; then
+    found=1
+    echo '```' >> "$REPORT"
+    echo "$hits" >> "$REPORT"
+    echo '```' >> "$REPORT"
+  else
+    echo "- OK: no matches" >> "$REPORT"
+  fi
+  echo "" >> "$REPORT"
+
+done <<< "$REPOS"
+
+if [[ -f "$WORKLOG" ]]; then
+  {
+    echo ""
+    echo "### no-any ($(date -Is))"
+    echo "- Report: \`worklog/${DATE}_no-any_${TASK}.md\`"
+  } >> "$WORKLOG"
+fi
+
+if [[ $found -eq 1 ]]; then
+  echo "FAIL (any found). See: $REPORT" >&2
+  exit 3
+fi
+
+echo "PASS (no-any). Report: $REPORT"

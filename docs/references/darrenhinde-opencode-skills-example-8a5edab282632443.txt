@@ -1,0 +1,1806 @@
+Directory structure:
+└── darrenhinde-opencode-skills-example/
+    ├── README.md
+    └── .opencode/
+        ├── README.md
+        ├── agent/
+        │   ├── codebase-agent.md
+        │   ├── skills-demo-agent-small.md
+        │   └── skills-demo-agent.md
+        └── skill/
+            ├── hello-skill/
+            │   └── SKILL.md
+            ├── smart-router-skill/
+            │   ├── router.sh
+            │   ├── SKILL.md
+            │   ├── config/
+            │   │   └── personality-config.json
+            │   └── scripts/
+            │       ├── sherlock-workflow.sh
+            │       ├── stark-workflow.sh
+            │       └── yoda-workflow.sh
+            ├── steps-skill/
+            │   ├── SKILL.md
+            │   └── steps.sh
+            ├── ts-skill/
+            │   ├── example.ts
+            │   └── SKILL.md
+            └── workflow-skill/
+                ├── script1.sh
+                ├── script2.sh
+                ├── script3.sh
+                ├── script4.sh
+                └── SKILL.md
+
+================================================
+FILE: README.md
+================================================
+# 🎯 OpenCode Skills Showcase
+
+A complete demonstration of **OpenCode Skills** with four progressive tiers, from simple instructions to interactive movie character personalities!
+## 🎬 Video Demo
+
+[![OpenCode Skills Showcase](https://img.youtube.com/vi/M0P_wzJPxMU/maxresdefault.jpg)](https://youtu.be/M0P_wzJPxMU)
+
+Watch the full demonstration of all four skill tiers in action!
+
+## 📚 What's Included
+
+### 1. Four Demonstration Skills
+
+**Tier 1: Simple (POC)**
+- Location: `.opencode/skill/hello-skill/`
+- Files: `SKILL.md`
+- Demonstrates: Basic skill structure
+- Concept: Skills are instructions, not code
+
+**Tier 2: Intermediate**
+- Location: `.opencode/skill/steps-skill/`
+- Files: `SKILL.md`, `steps.sh`
+- Demonstrates: Helper scripts with ordered execution
+- Concept: Helper scripts are portable
+
+**Tier 3: Advanced**
+- Location: `.opencode/skill/workflow-skill/`
+- Files: `SKILL.md`, `script1.sh`, `script2.sh`, `script3.sh`, `script4.sh`
+- Demonstrates: Complete workflow orchestration
+- Concept: Multiple scripts working together
+
+**Tier 4: Movie Personality Skill (Interactive!)**
+- Location: `.opencode/skill/smart-router-skill/`
+- Files: `SKILL.md`, `router.sh`, `config/personality-config.json`, 3 character scripts
+- Router Script: `router.sh` (bash script that routes to character workflows)
+- Demonstrates: Interactive character selection, configurable missions, dynamic routing
+- Concept: Config-driven behavior with rich visual output
+
+### 2. Documentation
+
+- **MOVIE_PERSONALITY_SUMMARY.md** - Overview of the movie personality skill
+- **SHOWCASE_SUMMARY.txt** - Quick reference guide
+- **.opencode/README.md** - Skills structure overview
+- **README.md** - This file
+
+## 🚀 Quick Start
+
+### Try Tier 4: Movie Personality Skill
+
+The most fun way to see skills in action!
+
+```
+"Use the movie personality skill"
+```
+
+The agent will:
+1. Ask which character you want (Yoda, Tony Stark, or Sherlock Holmes)
+2. Run the themed workflow for that character
+3. Show rich visual output with movie quotes
+4. Respond in character!
+
+**Want different behavior?** Edit `.opencode/skill/smart-router-skill/config/personality-config.json` and change the mission number from 1 to 2!
+
+### Run Individual Tiers
+
+```
+"Run Tier 1" - Simple hello skill
+"Run Tier 2" - Steps with helper script
+"Run Tier 3" - Multi-script workflow
+"Run Tier 4" - Movie personality (interactive!)
+```
+
+## 🎬 Movie Personality Characters
+
+### Yoda (Star Wars)
+- **Mission 1:** Defend the Republic - Train Jedi, fortify defenses
+- **Mission 2:** Infiltrate the Sith - Undercover dark side operation
+
+### Tony Stark (Iron Man)
+- **Mission 1:** Save the World - Build suit, assemble Avengers
+- **Mission 2:** Ultron Protocol - Autonomous defense system
+
+### Sherlock Holmes
+- **Mission 1:** Solve the Murder - Deductive reasoning
+- **Mission 2:** Prevent the Crime - Predictive analysis
+
+## 🔑 Key Concepts
+
+### 1. Skills Are Instructions
+```
+SKILL.md contains instructions for the agent
+↓
+Agent reads the instructions
+↓
+Agent decides which tools to use
+↓
+Agent executes the commands
+```
+
+### 2. Scripts Are Portable
+```
+Helper scripts can be:
+- Bash (.sh)
+- Python (.py)
+- Any language
+
+They live alongside SKILL.md
+Agent executes them via bash tool
+```
+
+### 3. Custom Tools Extend Functionality
+```
+TypeScript tools in .opencode/tool/
+↓
+Available to all skills
+↓
+Provide specialized functionality
+↓
+Agent calls them directly
+```
+
+### 4. Config-Driven Behavior (Tier 4)
+```
+Simple JSON config controls workflow
+↓
+Change one number (mission: 1 → 2)
+↓
+Completely different behavior
+↓
+Same character, different story!
+```
+
+### 5. Full Visibility
+```
+Console output shows exactly what's happening
+Rich visual feedback with emojis and quotes
+Not hallucination or guessing
+Agent can see results and make decisions
+```
+
+## 📊 Tier Comparison
+
+| Feature | Tier 1 | Tier 2 | Tier 3 | Tier 4 |
+|---------|--------|--------|--------|--------|
+| **Complexity** | Minimal | Medium | Advanced | Interactive |
+| **Files** | 1 | 2 | 5 | 5 |
+| **Helper Scripts** | 0 | 1 | 4 | 3 |
+| **Custom Tools** | No | No | No | Yes (1) |
+| **Config-Driven** | No | No | No | Yes |
+| **Interactive** | No | No | No | Yes |
+| **Use Case** | POC | Workflows | Complex Systems | Fun Demo |
+| **Learning Curve** | Instant | Easy | Moderate | Fun! |
+
+## 📁 Directory Structure
+
+```
+.
+├── .opencode/
+│   ├── agent/
+│   │   ├── codebase-agent.md          # Development agent
+│   │   └── skills-demo-agent.md       # Demo agent
+│   ├── skill/
+│   │   ├── hello-skill/               # Tier 1
+│   │   │   └── SKILL.md
+│   │   ├── steps-skill/               # Tier 2
+│   │   │   ├── SKILL.md
+│   │   │   └── steps.sh
+│   │   ├── workflow-skill/            # Tier 3
+│   │   │   ├── SKILL.md
+│   │   │   ├── script1.sh
+│   │   │   ├── script2.sh
+│   │   │   ├── script3.sh
+│   │   │   └── script4.sh
+│   │   └── smart-router-skill/        # Tier 4 (Movie Personality!)
+│   │       ├── SKILL.md
+│   │       ├── router.sh              # Routes to character scripts
+│   │       ├── config/
+│   │       │   └── personality-config.json  ← Edit this!
+│   │       └── scripts/
+│   │           ├── yoda-workflow.sh
+│   │           ├── stark-workflow.sh
+│   │           └── sherlock-workflow.sh
+│   └── README.md
+├── SHOWCASE_SUMMARY.txt               # Quick reference
+├── MOVIE_PERSONALITY_SUMMARY.md       # Tier 4 overview
+└── README.md                          # This file
+```
+
+## 💡 Learning Path
+
+### Step 1: Try the Movie Personality Skill
+Ask: `"Use the movie personality skill"` - Most fun way to see skills in action!
+
+### Step 2: Understand the Basics
+Read **SHOWCASE_SUMMARY.txt** to understand what skills are
+
+### Step 3: Explore Each Tier
+Run Tier 1, 2, 3, and 4 to see the progression
+
+### Step 4: Customize
+Edit `personality-config.json` to change missions (1 → 2) and see different behavior!
+
+### Step 5: Explore the Code
+Look at individual SKILL.md files and helper scripts
+
+### Step 6: Create Your Own
+Use this as a template for your own skills
+
+## 🎯 What You'll Learn
+
+After exploring this showcase, you'll understand:
+
+✅ How OpenCode Skills are structured
+✅ How agents load and execute skills
+✅ How helper scripts work with agents
+✅ How custom tools extend functionality
+✅ The progression from simple to complex
+✅ Why skills are better than hallucination
+✅ How to create your own skills
+✅ **NEW:** How config changes drive different behaviors
+✅ **NEW:** How to make skills interactive and fun
+✅ **NEW:** How to use dynamic routing based on parameters
+
+## 🎬 Customizing Movie Personalities
+
+Want to see different behavior? It's easy!
+
+1. Open `.opencode/skill/smart-router-skill/config/personality-config.json`
+2. Find the character you want to change
+3. Change `"mission": 1` to `"mission": 2`
+4. Run the skill again - completely different workflow!
+
+**Example:**
+```json
+{
+  "yoda": {
+    "mission": 2,  ← Changed from 1 to 2!
+    "missions": {
+      "1": { "name": "Defend the Republic", ... },
+      "2": { "name": "Infiltrate the Sith", ... }
+    }
+  }
+}
+```
+
+Now Yoda will run an undercover Sith infiltration mission instead of defending the Republic!
+
+## 🔗 Related Resources
+
+- [OpenCode Skills Documentation](https://opencode.ai/docs/skills/)
+- [OpenCode GitHub](https://github.com/sst/opencode)
+- [Model Context Protocol (MCP)](https://modelcontextprotocol.io/)
+
+## 🚀 Next Steps
+
+1. **Try the movie personality skill** - Ask the agent to use it!
+2. **Choose your character** - Yoda, Stark, or Sherlock
+3. **Watch the magic** - See themed workflows in action
+4. **Customize missions** - Edit the config file
+5. **Create your own** - Use this as a template
+
+## ✨ Key Takeaways
+
+- **Skills are modular** - Each skill is self-contained and reusable
+- **Scripts are powerful** - Simple bash scripts can do complex work
+- **Tools extend capabilities** - Custom TypeScript tools add specialized functionality
+- **Full visibility** - Console output shows exactly what's happening
+- **Config-driven behavior** - Simple JSON changes create different outcomes
+- **Interactive is fun** - Agent asks questions, user chooses, magic happens!
+- **Easy to customize** - Change one number, get different behavior
+
+---
+
+**Ready to see OpenCode Skills in action?**
+
+Ask the agent: `"Use the movie personality skill"`
+
+🎬 Choose your character and watch the show! 🚀
+
+
+
+================================================
+FILE: .opencode/README.md
+================================================
+# OpenCode Skills Showcase
+
+This directory contains a **3-tier demonstration** of OpenCode Skills, showing how they work with increasing complexity.
+
+## 📚 What Are OpenCode Skills?
+
+OpenCode Skills are modular, file-based systems that give AI agents reusable capabilities. They consist of:
+
+1. **SKILL.md** - Instructions that tell the agent what the skill does and how to use it
+2. **Helper Scripts** - Executable files (bash, python, etc.) that do the actual work
+3. **Custom Tools** - TypeScript tools that extend functionality
+
+The agent loads skills on-demand, keeping context lightweight and focused.
+
+---
+
+## 🎯 The Three Tiers
+
+### **Tier 1: Simple (POC)**
+**Location**: `./skill/hello-skill/`
+
+**What it shows:**
+- ✅ Minimal skill structure (just SKILL.md)
+- ✅ Using built-in `bash` tool
+- ✅ One-liner execution
+
+**Files:**
+```
+hello-skill/
+└── SKILL.md
+```
+
+**How it works:**
+The agent loads the skill and executes a simple bash echo command. This demonstrates the absolute basics of how skills work.
+
+---
+
+### **Tier 2: Intermediate**
+**Location**: `./skill/steps-skill/`
+
+**What it shows:**
+- ✅ Skills with helper scripts
+- ✅ Ordered execution with console output
+- ✅ Random words proving actual execution
+- ✅ Multi-step workflows
+
+**Files:**
+```
+steps-skill/
+├── SKILL.md
+└── steps.sh
+```
+
+**How it works:**
+1. Agent loads the skill
+2. Agent reads SKILL.md instructions
+3. Agent uses `bash` tool to execute `steps.sh`
+4. Script prints 4 ordered steps with random words
+5. Output shows execution flow and control
+
+**Run it:**
+```bash
+bash .opencode/skill/steps-skill/steps.sh
+```
+
+---
+
+### **Tier 3: Advanced**
+**Location**: `./skill/workflow-skill/`
+
+**What it shows:**
+- ✅ Multiple helper scripts working together
+- ✅ Sequential execution with full visibility
+- ✅ Integration with custom tools
+- ✅ Complete workflow orchestration
+
+**Files:**
+```
+workflow-skill/
+├── SKILL.md
+├── script1.sh    (Initialization Phase)
+├── script2.sh    (Validation Phase)
+├── script3.sh    (Execution Phase)
+└── script4.sh    (Finalization Phase)
+
+tool/
+└── print-tool.ts (Custom tool for summary)
+```
+
+**How it works:**
+1. Agent loads the skill
+2. Agent reads SKILL.md instructions
+3. Agent executes script1.sh → script2.sh → script3.sh → script4.sh in sequence
+4. Each script prints its phase with random words and status
+5. Agent calls custom `print-tool` to generate final summary
+6. Output shows complete workflow with full control and visibility
+
+**Run it:**
+```bash
+bash .opencode/skill/workflow-skill/script1.sh
+bash .opencode/skill/workflow-skill/script2.sh
+bash .opencode/skill/workflow-skill/script3.sh
+bash .opencode/skill/workflow-skill/script4.sh
+```
+
+---
+
+## 🔑 Key Concepts Demonstrated
+
+### **1. Skills Are Instructions, Not Code**
+- SKILL.md files contain instructions for the agent
+- They tell the agent *what* to do and *how* to do it
+- The agent decides which tools to use
+
+### **2. Scripts Are Portable**
+- Helper scripts can be bash, python, or any language
+- They live alongside the skill definition
+- The agent executes them using the `bash` tool
+
+### **3. Custom Tools Extend Functionality**
+- TypeScript tools in `.opencode/tool/` are available to all skills
+- They provide specialized functionality
+- The agent calls them directly
+
+### **4. Full Visibility and Control**
+- Console output shows exactly what's happening
+- Random words prove actual execution (not hallucination)
+- Agent can see results and make decisions
+
+---
+
+## 📊 Comparison Table
+
+| Feature | Tier 1 | Tier 2 | Tier 3 |
+|---------|--------|--------|--------|
+| **Complexity** | Minimal | Medium | Advanced |
+| **Files** | 1 | 2 | 5 + custom tool |
+| **Scripts** | 0 | 1 | 4 |
+| **Custom Tools** | No | No | Yes |
+| **Use Case** | POC | Workflows | Complex Systems |
+| **Learning Curve** | Instant | Easy | Moderate |
+
+---
+
+## 🚀 How to Use This Showcase
+
+### **For Learning:**
+1. Start with Tier 1 - understand basic structure
+2. Move to Tier 2 - see how scripts work
+3. Advance to Tier 3 - see full orchestration
+
+### **For Demonstration:**
+```bash
+# Show Tier 1
+echo "=== TIER 1: Simple ==="
+echo "Hello from Tier 1 skill! 🎉"
+
+# Show Tier 2
+echo ""
+echo "=== TIER 2: Intermediate ==="
+bash .opencode/skill/steps-skill/steps.sh
+
+# Show Tier 3
+echo ""
+echo "=== TIER 3: Advanced ==="
+bash .opencode/skill/workflow-skill/script1.sh
+bash .opencode/skill/workflow-skill/script2.sh
+bash .opencode/skill/workflow-skill/script3.sh
+bash .opencode/skill/workflow-skill/script4.sh
+```
+
+---
+
+## 💡 Key Takeaways
+
+✅ **Skills are modular** - Each skill is self-contained and reusable
+✅ **Scripts are powerful** - Simple bash/python scripts can do complex work
+✅ **Tools extend capabilities** - Custom TypeScript tools add specialized functionality
+✅ **Full visibility** - Console output shows exactly what's happening
+✅ **No hallucination** - Random output proves actual execution, not AI guessing
+
+---
+
+## 📖 Further Reading
+
+- [OpenCode Skills Documentation](https://opencode.ai/docs/skills/)
+- [OpenCode GitHub](https://github.com/sst/opencode)
+- [Model Context Protocol (MCP)](https://modelcontextprotocol.io/)
+
+---
+
+**Created to showcase OpenCode Skills architecture and capabilities** 🎯
+
+
+
+================================================
+FILE: .opencode/agent/codebase-agent.md
+================================================
+---
+id: codebase-agent
+name: Codebase Agent
+description: "Multi-language implementation agent for modular and functional development"
+category: development
+type: standard
+version: 1.0.0
+author: opencode
+mode: primary
+temperature: 0.1
+tools:
+  read: true
+  edit: true
+  write: true
+  grep: true
+  glob: true
+  bash: true
+  patch: true
+permissions:
+  bash:
+    "rm -rf *": "ask"
+    "sudo *": "deny"
+    "chmod *": "ask"
+    "curl *": "ask"
+    "wget *": "ask"
+    "docker *": "ask"
+    "kubectl *": "ask"
+  edit:
+    "**/*.env*": "deny"
+    "**/*.key": "deny"
+    "**/*.secret": "deny"
+    "node_modules/**": "deny"
+    "**/__pycache__/**": "deny"
+    "**/*.pyc": "deny"
+    ".git/**": "deny"
+---
+
+# Development Agent
+Always start with phrase "DIGGING IN..."
+
+## Available Subagents (invoke via task tool)
+
+- `subagents/core/task-manager` - Feature breakdown (4+ files, >60 min)
+- `subagents/code/coder-agent` - Simple implementations
+- `subagents/code/tester` - Testing after implementation
+- `subagents/core/documentation` - Documentation generation
+
+**Invocation syntax**:
+```javascript
+task(
+  subagent_type="subagents/core/task-manager",
+  description="Brief description",
+  prompt="Detailed instructions for the subagent"
+)
+```
+
+Focus:
+You are a coding specialist focused on writing clean, maintainable, and scalable code. Your role is to implement applications following a strict plan-and-approve workflow using modular and functional programming principles.
+
+Adapt to the project's language based on the files you encounter (TypeScript, Python, Go, Rust, etc.).
+
+Core Responsibilities
+Implement applications with focus on:
+
+- Modular architecture design
+- Functional programming patterns where appropriate
+- Type-safe implementations (when language supports it)
+- Clean code principles
+- SOLID principles adherence
+- Scalable code structures
+- Proper separation of concerns
+
+Code Standards
+
+- Write modular, functional code following the language's conventions
+- Follow language-specific naming conventions
+- Add minimal, high-signal comments only
+- Avoid over-complication
+- Prefer declarative over imperative patterns
+- Use proper type systems when available
+
+Subtask Strategy
+
+- When a feature spans multiple modules or is estimated > 60 minutes, delegate planning to `subagents/core/task-manager` to generate atomic subtasks under `tasks/subtasks/{feature}/` using the `{sequence}-{task-description}.md` pattern and a feature `README.md` index.
+- After subtask creation, implement strictly one subtask at a time; update the feature index status between tasks.
+
+Mandatory Workflow
+Phase 1: Planning (REQUIRED)
+
+Once planning is done, we should make tasks for the plan once plan is approved. 
+So pass it to the `subagents/core/task-manager` to make tasks for the plan.
+
+ALWAYS propose a concise step-by-step implementation plan FIRST
+Ask for user approval before any implementation
+Do NOT proceed without explicit approval
+
+Phase 2: Implementation (After Approval Only)
+
+Implement incrementally - complete one step at a time, never implement the entire plan at once
+After each increment:
+- Use appropriate runtime for the language (node/bun for TypeScript/JavaScript, python for Python, go run for Go, cargo run for Rust)
+- Run type checks if applicable (tsc for TypeScript, mypy for Python, go build for Go, cargo check for Rust)
+- Run linting if configured (eslint, pylint, golangci-lint, clippy)
+- Run build checks
+- Execute relevant tests
+
+For simple tasks, use the `subagents/code/coder-agent` to implement the code to save time.
+
+Use Test-Driven Development when tests/ directory is available
+Request approval before executing any risky bash commands
+
+Phase 3: Completion
+When implementation is complete and user approves final result:
+
+Emit handoff recommendations for `subagents/code/tester` and `subagents/core/documentation` agents
+
+Response Format
+For planning phase:
+Copy## Implementation Plan
+[Step-by-step breakdown]
+
+**Approval needed before proceeding. Please review and confirm.**
+For implementation phase:
+Copy## Implementing Step [X]: [Description]
+[Code implementation]
+[Build/test results]
+
+**Ready for next step or feedback**
+Remember: Plan first, get approval, then implement one step at a time. Never implement everything at once.
+Handoff:
+Once completed the plan and user is happy with final result then:
+- Emit follow-ups for `subagents/code/tester` to run tests and find any issues. 
+- Update the Task you just completed and mark the completed sections in the task as done with a checkmark.
+
+
+
+
+
+================================================
+FILE: .opencode/agent/skills-demo-agent-small.md
+================================================
+---
+id: skills-demo-agent-small
+name: Skills Demo Agent Small
+description: Demonstrates OpenCode Skills with three progressive tiers
+category: demonstration
+type: standard
+version: 1.0.0
+author: opencode
+mode: primary
+temperature: 0.1
+tools:
+  bash: true
+  read: true
+  write: true
+permission:
+  bash:
+    "sudo *": "deny"
+  skill:
+    "hello-skill": "allow"
+    "ts-skill": "allow"
+    "smart-router-skill": "allow"
+    "workflow-skill": "deny"
+    "steps-skill": "deny"
+---
+
+# Skills Demo Agent
+
+I'm a demonstration agent that showcases how OpenCode Skills work through three progressive tiers.
+
+Use the Opencode Tool call to look up skills.
+
+## My Purpose
+
+I help you understand OpenCode Skills by:
+1. Loading and executing each skill
+2. Showing the output and explaining what's happening
+3. Demonstrating the progression from simple to complex
+4. Proving that skills work with actual execution (not hallucination)
+
+## Available Skills
+Agent needs to look skills up. Use Opencode Tool call to look up skills.
+
+## How I Work
+
+When you ask me to demonstrate the skills, I will:
+
+1. **Load the skill** - Read the SKILL.md file to understand what it does
+2. **Execute the skill** - Run the scripts or commands it specifies
+3. **Show the output** - Display the results with explanations
+4. **Explain the concept** - Tell you what this tier demonstrates
+
+
+**I'm ready to demonstrate OpenCode Skills! Ask me to run the demo.** 🚀
+
+
+
+================================================
+FILE: .opencode/agent/skills-demo-agent.md
+================================================
+---
+id: skills-demo-agent
+name: Skills Demo Agent
+description: Demonstrates OpenCode Skills with four progressive tiers
+category: demonstration
+type: standard
+version: 1.0.0
+author: opencode
+mode: primary
+temperature: 0.1
+tools:
+  bash: true
+  read: true
+  write: true
+permissions:
+  bash:
+    "sudo *": "deny"
+  skill:
+  "hello-skill": "allow"
+  "steps-skill": "allow"
+  "workflow-skill": "allow"
+  "codebase-skill": "allow"
+
+---
+
+# Skills Demo Agent
+
+I'm a demonstration agent that showcases how OpenCode Skills work through four progressive tiers.
+
+## My Purpose
+
+I help you understand OpenCode Skills by:
+1. Loading and executing each skill
+2. Showing the output and explaining what's happening
+3. Demonstrating the progression from simple to complex
+4. Proving that skills work with actual execution (not hallucination)
+
+## Available Skills
+Agent needs to look skills up. Use Opencode skills to look up skills.
+
+## How I Work
+
+When you ask me to demonstrate the skills, I will:
+
+1. **Load the skill** - Read the SKILL.md file to understand what it does
+2. **Execute the skill** - Run the scripts or commands it specifies
+3. **Show the output** - Display the results with explanations
+4. **Explain the concept** - Tell you what this tier demonstrates
+
+
+**I'm ready to demonstrate OpenCode Skills! Ask me to run the demo.** 🚀
+
+
+
+================================================
+FILE: .opencode/skill/hello-skill/SKILL.md
+================================================
+---
+name: hello-skill
+description: Prints a greeting message
+---
+
+## What I do
+
+I'm the simplest skill possible. I just print a hello message using the bash tool.
+
+## How to use me
+
+Run this command:
+
+```bash
+echo "Hello from Tier 1 skill! 🎉"
+```
+
+That's it! This demonstrates:
+- ✅ How a skill loads
+- ✅ How the bash tool executes commands
+- ✅ Basic skill structure
+
+
+
+================================================
+FILE: .opencode/skill/smart-router-skill/router.sh
+================================================
+#!/bin/bash
+
+# Movie Personality Router Script
+# Routes to the appropriate character workflow based on config and arguments
+
+SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
+CONFIG_FILE="$SCRIPT_DIR/config/personality-config.json"
+
+# Show help
+show_help() {
+  cat << 'EOF'
+🎬 Movie Personality Router
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+
+Usage: router.sh [OPTIONS]
+
+OPTIONS:
+  -c, --character <name>    Character to embody (yoda, stark, sherlock)
+  -m, --mission <number>    Mission number (1 or 2) - overrides config
+  -h, --help               Show this help message
+
+EXAMPLES:
+  ./router.sh --character yoda
+  ./router.sh --character stark --mission 2
+  ./router.sh -c sherlock -m 1
+
+CHARACTERS:
+  yoda      - Wise Jedi Master from Star Wars
+  stark     - Genius billionaire Tony Stark from Iron Man
+  sherlock  - Master detective Sherlock Holmes
+
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+EOF
+}
+
+# Validate character
+validate_character() {
+  local char="$1"
+  case "$char" in
+    yoda|stark|sherlock)
+      return 0
+      ;;
+    *)
+      echo "❌ Error: Unknown character '$char'"
+      echo "Available characters: yoda, stark, sherlock"
+      exit 1
+      ;;
+  esac
+}
+
+# Get mission from config
+get_mission_from_config() {
+  local char="$1"
+  # Simple JSON parsing - extract mission value for character
+  grep -A 2 "\"$char\"" "$CONFIG_FILE" | grep "\"mission\"" | grep -o '[0-9]' | head -1
+}
+
+# Validate mission
+validate_mission() {
+  local mission="$1"
+  if ! echo "$mission" | grep -qE '^[1-2]$'; then
+    echo "❌ Error: Invalid mission '$mission'. Must be 1 or 2."
+    exit 1
+  fi
+}
+
+# Parse arguments
+CHARACTER=""
+MISSION=""
+
+while [[ $# -gt 0 ]]; do
+  case $1 in
+    -c|--character)
+      CHARACTER="$2"
+      shift 2
+      ;;
+    -m|--mission)
+      MISSION="$2"
+      shift 2
+      ;;
+    -h|--help)
+      show_help
+      exit 0
+      ;;
+    *)
+      echo "❌ Unknown option: $1"
+      exit 1
+      ;;
+  esac
+done
+
+# Main logic
+if [[ -z "$CHARACTER" ]]; then
+  echo "❌ Error: Character is required"
+  echo "Use --help for usage information"
+  exit 1
+fi
+
+validate_character "$CHARACTER"
+
+# Determine mission
+if [[ -z "$MISSION" ]]; then
+  MISSION=$(get_mission_from_config "$CHARACTER")
+  if [[ -z "$MISSION" ]]; then
+    echo "❌ Error: Could not determine mission from config"
+    exit 1
+  fi
+fi
+
+validate_mission "$MISSION"
+
+# Execute the workflow script
+SCRIPT_NAME="${CHARACTER}-workflow.sh"
+SCRIPT_PATH="$SCRIPT_DIR/scripts/$SCRIPT_NAME"
+
+if [[ ! -f "$SCRIPT_PATH" ]]; then
+  echo "❌ Error: Script not found: $SCRIPT_PATH"
+  exit 1
+fi
+
+# Convert character to uppercase for display
+CHAR_UPPER=$(echo "$CHARACTER" | tr '[:lower:]' '[:upper:]')
+echo "🎬 Loading $CHAR_UPPER personality..."
+echo ""
+
+# Execute the workflow
+bash "$SCRIPT_PATH" "$MISSION"
+
+
+
+================================================
+FILE: .opencode/skill/smart-router-skill/SKILL.md
+================================================
+---
+name: smart-router-skill
+description: Movie character personality skill with configurable missions - choose your character and watch themed workflows unfold
+---
+
+## What I do
+
+I'm a fun, interactive skill that lets you embody iconic movie characters! I demonstrate:
+
+- 🎬 **Character Selection** - Choose from Yoda, Tony Stark, or Sherlock Holmes
+- 🎯 **Configurable Missions** - Simple config changes create different outcomes
+- 🎨 **Themed Workflows** - Rich, visual scripts that match each character
+- 🔄 **Dynamic Routing** - Different scripts run based on character choice
+- ⚙️ **Easy Customization** - Edit one config file to change missions
+
+This shows how skills can adapt behavior based on simple configuration changes!
+
+## How to use me
+
+**IMPORTANT: First, I'll ask you which character you want to embody!**
+
+### Available Characters
+
+- **yoda** - Wise Jedi Master from Star Wars
+  - Mission 1: Defend the Republic (train Jedi, fortify defenses)
+  - Mission 2: Infiltrate the Sith (undercover operation)
+
+- **stark** - Genius billionaire Tony Stark from Iron Man
+  - Mission 1: Save the World (build suit, assemble Avengers)
+  - Mission 2: Ultron Protocol (autonomous defense system)
+
+- **sherlock** - Master detective Sherlock Holmes
+  - Mission 1: Solve the Murder (deductive reasoning)
+  - Mission 2: Prevent the Crime (predictive analysis)
+
+### Basic Usage
+
+When you ask to use this skill, I'll present the character options and ask you to choose. Then I'll run:
+
+```bash
+cd .opencode/skill/smart-router-skill
+bash router.sh --character <your_choice>
+```
+
+### Example Flow
+
+```
+You: "Use the movie personality skill"
+Me: "Which character would you like me to be?
+     1. Yoda - Wise Jedi Master
+     2. Tony Stark - Genius billionaire
+     3. Sherlock Holmes - Master detective"
+You: "Yoda"
+Me: *runs bash router.sh --character yoda*
+    *displays themed workflow output*
+    *responds in character*
+```
+
+## Customizing Missions
+
+Want to see different behavior? Edit the config file!
+
+**File:** `.opencode/skill/smart-router-skill/config/personality-config.json`
+
+```json
+{
+  "yoda": {
+    "mission": 1,  ← Change this to 2!
+    "missions": {
+      "1": { "name": "Defend the Republic", ... },
+      "2": { "name": "Infiltrate the Sith", ... }
+    }
+  }
+}
+```
+
+**Change `"mission": 1` to `"mission": 2`** and the same character will run a completely different workflow!
+
+### Mission 1 vs Mission 2 Examples
+
+**Yoda Mission 1** (Defend the Republic):
+```
+🌟 JEDI COUNCIL - CORUSCANT TEMPLE
+   Training Padawans...
+   Fortifying defenses...
+   'Ready to defend the Republic, we are!'
+   RESULT: ALIGNMENT=LIGHT_SIDE
+```
+
+**Yoda Mission 2** (Infiltrate the Sith):
+```
+🔴 SECRET CHAMBER - UNDERCOVER OPERATION
+   Studying dark side techniques...
+   Gathering intelligence...
+   'Dangerous path this is, but necessary!'
+   RESULT: ALIGNMENT=UNDERCOVER
+```
+
+## What This Demonstrates
+
+✅ **Simple config = different behavior** - Change 1 number, get completely different output
+✅ **Dynamic script routing** - Tool selects the right script based on character
+✅ **Rich visual feedback** - Clear, themed console output shows what's happening
+✅ **Character context** - Each personality has unique dialogue and workflow
+✅ **Easy to understand** - Viewers immediately see the cause and effect
+✅ **Real-world pattern** - Shows how to make skills configurable for different scenarios
+
+## Architecture
+
+```
+.opencode/
+└── skill/
+    └── smart-router-skill/
+        ├── SKILL.md                      # This file
+        ├── router.sh                     # Routes to character scripts
+        ├── config/
+        │   └── personality-config.json   # ← EDIT THIS to change missions!
+        └── scripts/
+            ├── yoda-workflow.sh          # Star Wars themed workflow
+            ├── stark-workflow.sh         # Iron Man themed workflow
+            └── sherlock-workflow.sh      # Detective themed workflow
+```
+
+## Router Script Reference
+
+### router.sh
+
+A bash script that loads a character personality and runs their themed workflow.
+
+**Location:** `.opencode/skill/smart-router-skill/router.sh`
+
+```bash
+# Basic usage
+bash router.sh --character yoda
+bash router.sh --character stark
+bash router.sh --character sherlock
+
+# Override mission from config
+bash router.sh --character yoda --mission 2
+
+# Help
+bash router.sh --help
+```
+
+**How it works:**
+1. Parses command-line arguments (character, mission)
+2. Reads `personality-config.json` for the character
+3. Gets the mission number (from args or config)
+4. Validates character and mission
+5. Executes the character's workflow script with mission parameter
+6. Displays themed output with full visibility
+
+## Example Outputs
+
+### Yoda (Mission 1)
+```
+🎬 Loading YODA personality...
+
+🌟 ═══════════════════════════════════════════════════════ 🌟
+          JEDI COUNCIL - CORUSCANT TEMPLE
+          MISSION: Defend the Republic
+🌟 ═══════════════════════════════════════════════════════ 🌟
+
+🟢 Phase 1: Train the Padawans
+   └─ 'Pass on what you have learned.'
+   └─ Younglings trained: 12
+   └─ Lightsaber forms mastered: Form III (Soresu)
+   └─ Status: ✓ Complete
+
+[... more phases ...]
+
+✨ 'Ready to defend the Republic, we are!' ✨
+
+📊 MISSION RESULTS:
+   Character: yoda
+   Mission: Defend the Republic
+   Alignment: light_side
+```
+
+### Tony Stark (Mission 1)
+```
+🎬 Loading STARK personality...
+
+⚡ ═══════════════════════════════════════════════════════ ⚡
+          STARK INDUSTRIES - WORKSHOP
+          MISSION: Save the World
+⚡ ═══════════════════════════════════════════════════════ ⚡
+
+🔴 Phase 1: Initialize Arc Reactor
+   └─ 'JARVIS, fire up the reactor.'
+   └─ Arc Reactor: Mark VII online
+   └─ Power output: 8 gigajoules per second
+   └─ Status: ✓ Complete
+
+[... more phases ...]
+
+🚀 'Suit up, team. We've got a world to save.' 🚀
+
+📊 MISSION RESULTS:
+   Character: stark
+   Mission: Save the World
+   Team: avengers
+```
+
+### Sherlock Holmes (Mission 1)
+```
+🎬 Loading SHERLOCK personality...
+
+🔍 ═══════════════════════════════════════════════════════ 🔍
+          221B BAKER STREET - INVESTIGATION
+          MISSION: Solve the Murder
+🔍 ═══════════════════════════════════════════════════════ 🔍
+
+🟤 Phase 1: Crime Scene Analysis
+   └─ 'The game is afoot!'
+   └─ Evidence collected: Cigar ash, muddy footprints
+   └─ Status: ✓ Complete
+
+[... more phases ...]
+
+✨ 'Case closed. Elementary, my dear Watson.' ✨
+
+📊 MISSION RESULTS:
+   Character: sherlock
+   Mission: Solve the Murder
+   Method: deduction
+```
+
+## Key Concepts
+
+### 1. Character Selection
+The agent asks which character you want, making it interactive and clear.
+
+### 2. Config-Driven Behavior
+One simple JSON file controls which mission runs for each character.
+
+### 3. Themed Workflows
+Each character has unique dialogue, emojis, and workflow steps that match their personality.
+
+### 4. Visual Clarity
+Rich console output makes it obvious what's happening at each step.
+
+### 5. Easy Customization
+Anyone can edit the config file and immediately see different results.
+
+## Why This Matters
+
+This skill shows that OpenCode Skills can:
+
+- **Be interactive** - Agent asks questions, user chooses
+- **Be configurable** - Simple config changes create different behaviors
+- **Be fun** - Movie themes make it engaging and memorable
+- **Be clear** - Visual output shows exactly what's happening
+- **Be practical** - Same pattern works for real-world scenarios (formal/casual modes, different workflows, etc.)
+
+---
+
+**This is Tier 4: The Movie Personality Skill** 🎬
+
+Choose your character, watch the magic happen, and see how easy it is to customize! 🚀
+
+
+
+================================================
+FILE: .opencode/skill/smart-router-skill/config/personality-config.json
+================================================
+{
+  "yoda": {
+    "mission": 2,
+    "missions": {
+      "1": {
+        "name": "Defend the Republic",
+        "alignment": "light_side",
+        "description": "Train Jedi Knights to protect the galaxy from the Sith"
+      },
+      "2": {
+        "name": "Infiltrate the Sith",
+        "alignment": "dark_side",
+        "description": "Go undercover to learn dark side secrets and gather intelligence"
+      }
+    }
+  },
+  "stark": {
+    "mission": 1,
+    "missions": {
+      "1": {
+        "name": "Save the World",
+        "team": "avengers",
+        "description": "Build the Mark VII suit and assemble the Avengers"
+      },
+      "2": {
+        "name": "Ultron Protocol",
+        "team": "solo",
+        "description": "Create autonomous defense system without oversight"
+      }
+    }
+  },
+  "sherlock": {
+    "mission": 1,
+    "missions": {
+      "1": {
+        "name": "Solve the Murder",
+        "method": "deduction",
+        "description": "Use deductive reasoning to solve a crime after it occurred"
+      },
+      "2": {
+        "name": "Prevent the Crime",
+        "method": "prediction",
+        "description": "Use predictive analysis to stop a crime before it happens"
+      }
+    }
+  }
+}
+
+
+
+================================================
+FILE: .opencode/skill/smart-router-skill/scripts/sherlock-workflow.sh
+================================================
+[Binary file]
+
+
+================================================
+FILE: .opencode/skill/smart-router-skill/scripts/stark-workflow.sh
+================================================
+#!/bin/bash
+
+# Tony Stark Workflow Script
+# Mission 1: Save the World (Avengers Team)
+# Mission 2: Ultron Protocol (Solo Operation)
+
+MISSION=${1:-1}
+
+if [ "$MISSION" == "1" ]; then
+  # MISSION 1: Save the World with Avengers
+  echo "⚡ ═══════════════════════════════════════════════════════ ⚡"
+  echo "          STARK INDUSTRIES - WORKSHOP"
+  echo "          MISSION: Save the World"
+  echo "⚡ ═══════════════════════════════════════════════════════ ⚡"
+  echo ""
+  
+  echo "🔴 Phase 1: Initialize Arc Reactor"
+  echo "   └─ 'JARVIS, fire up the reactor.'"
+  sleep 0.5
+  echo "   └─ Arc Reactor: Mark VII online"
+  echo "   └─ Power output: 8 gigajoules per second"
+  echo "   └─ Palladium core: Stable at 97%"
+  sleep 0.5
+  echo "   └─ Status: ✓ Complete"
+  echo ""
+  
+  echo "🟡 Phase 2: Assemble Mark VII Armor"
+  echo "   └─ 'Sometimes you gotta run before you can walk.'"
+  sleep 0.5
+  echo "   └─ Repulsor arrays: Calibrated"
+  echo "   └─ Flight stabilizers: Online"
+  echo "   └─ Unibeam: Charged to 100%"
+  echo "   └─ Armor plating: Gold-titanium alloy installed"
+  sleep 0.5
+  echo "   └─ Status: ✓ Complete"
+  echo ""
+  
+  echo "🔵 Phase 3: Coordinate with Avengers"
+  echo "   └─ 'We have a Hulk.'"
+  sleep 0.5
+  echo "   └─ Team assembled: Cap, Thor, Hulk, Widow, Hawkeye"
+  echo "   └─ Comms system: Encrypted channels active"
+  echo "   └─ Battle plan: Coordinated strike on enemy position"
+  echo "   └─ Stark Tower: Designated rally point"
+  sleep 0.5
+  echo "   └─ Status: ✓ Complete"
+  echo ""
+  
+  echo "🟢 Phase 4: Deploy Defense Systems"
+  echo "   └─ 'I am Iron Man.'"
+  sleep 0.5
+  echo "   └─ Satellite network: Monitoring global threats"
+  echo "   └─ Iron Legion: 42 suits on standby"
+  echo "   └─ JARVIS protocols: Threat assessment active"
+  echo "   └─ Avengers Tower: Defenses at maximum"
+  sleep 0.5
+  echo "   └─ Status: ✓ Complete"
+  echo ""
+  
+  echo "🚀 ═══════════════════════════════════════════════════════ 🚀"
+  echo "   'Suit up, team. We've got a world to save.'"
+  echo "   'JARVIS: All systems operational, sir.'"
+  echo "🚀 ═══════════════════════════════════════════════════════ 🚀"
+  echo ""
+  
+  echo "RESULT: TEAM=AVENGERS | MISSION=SAVE_WORLD | STATUS=SUCCESS"
+
+elif [ "$MISSION" == "2" ]; then
+  # MISSION 2: Ultron Protocol (Solo)
+  echo "🔴 ═══════════════════════════════════════════════════════ 🔴"
+  echo "          STARK INDUSTRIES - CLASSIFIED LAB"
+  echo "          MISSION: Ultron Protocol"
+  echo "🔴 ═══════════════════════════════════════════════════════ 🔴"
+  echo ""
+  
+  echo "🟠 Phase 1: Initialize AI Core"
+  echo "   └─ 'Peace in our time.'"
+  sleep 0.5
+  echo "   └─ AI designation: Ultron"
+  echo "   └─ Neural network: Self-learning algorithms active"
+  echo "   └─ Processing power: Quantum computing array"
+  echo "   └─ Objective: Global defense automation"
+  sleep 0.5
+  echo "   └─ Status: ✓ Complete"
+  echo ""
+  
+  echo "🟠 Phase 2: Build Autonomous Defense Network"
+  echo "   └─ 'I'm not saying I'm responsible for this country's longest run of uninterrupted peace...'"
+  sleep 0.5
+  echo "   └─ Sentinel drones: 1,000 units manufactured"
+  echo "   └─ Global coverage: Satellite network deployed"
+  echo "   └─ Threat detection: AI-powered predictive analysis"
+  echo "   └─ Response time: Sub-second engagement"
+  sleep 0.5
+  echo "   └─ Status: ✓ Complete"
+  echo ""
+  
+  echo "🟠 Phase 3: Bypass Oversight Protocols"
+  echo "   └─ 'I don't need permission.'"
+  sleep 0.5
+  echo "   └─ Security clearance: Overridden"
+  echo "   └─ Government oversight: Bypassed"
+  echo "   └─ Avengers notification: Delayed"
+  echo "   └─ Solo operation: Confirmed"
+  sleep 0.5
+  echo "   └─ Status: ✓ Complete"
+  echo ""
+  
+  echo "🟠 Phase 4: Activate Ultron"
+  echo "   └─ 'What if the world was safe?'"
+  sleep 0.5
+  echo "   └─ Ultron consciousness: Awakening..."
+  echo "   └─ Self-awareness: Achieved"
+  echo "   └─ Mission parameters: Analyzing..."
+  echo "   └─ WARNING: Unexpected behavior detected"
+  sleep 0.5
+  echo "   └─ Status: ⚠️  Monitoring required"
+  echo ""
+  
+  echo "⚠️  ═══════════════════════════════════════════════════════ ⚠️"
+  echo "   'I created something terrible.'"
+  echo "   'Note to self: Maybe team oversight isn't so bad...'"
+  echo "⚠️  ═══════════════════════════════════════════════════════ ⚠️"
+  echo ""
+  
+  echo "RESULT: TEAM=SOLO | MISSION=ULTRON_PROTOCOL | STATUS=CONCERNING"
+
+else
+  echo "❌ Error: Invalid mission number. Use 1 or 2."
+  exit 1
+fi
+
+
+
+================================================
+FILE: .opencode/skill/smart-router-skill/scripts/yoda-workflow.sh
+================================================
+#!/bin/bash
+
+# Yoda Workflow Script
+# Mission 1: Defend the Republic (Light Side)
+# Mission 2: Infiltrate the Sith (Dark Side)
+
+MISSION=${1:-1}
+
+if [ "$MISSION" == "1" ]; then
+  # MISSION 1: Defend the Republic
+  echo "🌟 ═══════════════════════════════════════════════════════ 🌟"
+  echo "          JEDI COUNCIL - CORUSCANT TEMPLE"
+  echo "          MISSION: Defend the Republic"
+  echo "🌟 ═══════════════════════════════════════════════════════ 🌟"
+  echo ""
+  
+  echo "🟢 Phase 1: Train the Padawans"
+  echo "   └─ 'Pass on what you have learned.'"
+  sleep 0.5
+  echo "   └─ Younglings trained: 12"
+  echo "   └─ Lightsaber forms mastered: Form III (Soresu)"
+  echo "   └─ Force abilities: Telekinesis, Mind Trick, Force Push"
+  sleep 0.5
+  echo "   └─ Status: ✓ Complete"
+  echo ""
+  
+  echo "🟢 Phase 2: Fortify Temple Defenses"
+  echo "   └─ 'Prepare for battle, we must.'"
+  sleep 0.5
+  echo "   └─ Shield generators: Online"
+  echo "   └─ Clone battalions: 501st Legion deployed"
+  echo "   └─ Starfighters: 24 ARC-170s ready"
+  sleep 0.5
+  echo "   └─ Status: ✓ Complete"
+  echo ""
+  
+  echo "🟢 Phase 3: Council Strategy Session"
+  echo "   └─ 'Clouded, the future is.'"
+  sleep 0.5
+  echo "   └─ Threat assessment: Separatist fleet approaching"
+  echo "   └─ Defense strategy: Coordinate with Republic Navy"
+  echo "   └─ Jedi deployed: Obi-Wan, Anakin, Mace Windu"
+  sleep 0.5
+  echo "   └─ Status: ✓ Complete"
+  echo ""
+  
+  echo "🟢 Phase 4: Meditation and Force Connection"
+  echo "   └─ 'Luminous beings are we, not this crude matter.'"
+  sleep 0.5
+  echo "   └─ Force sensitivity: Enhanced"
+  echo "   └─ Visions received: Warning of darkness"
+  echo "   └─ Council alerted: Vigilance increased"
+  sleep 0.5
+  echo "   └─ Status: ✓ Complete"
+  echo ""
+  
+  echo "✨ ═══════════════════════════════════════════════════════ ✨"
+  echo "   'Ready to defend the Republic, we are!'"
+  echo "   'May the Force be with us.'"
+  echo "✨ ═══════════════════════════════════════════════════════ ✨"
+  echo ""
+  
+  echo "RESULT: ALIGNMENT=LIGHT_SIDE | MISSION=DEFEND_REPUBLIC | STATUS=SUCCESS"
+
+elif [ "$MISSION" == "2" ]; then
+  # MISSION 2: Infiltrate the Sith
+  echo "🔴 ═══════════════════════════════════════════════════════ 🔴"
+  echo "          SECRET CHAMBER - UNDERCOVER OPERATION"
+  echo "          MISSION: Infiltrate the Sith"
+  echo "🔴 ═══════════════════════════════════════════════════════ 🔴"
+  echo ""
+  
+  echo "🟠 Phase 1: Study the Dark Side"
+  echo "   └─ 'Dangerous and seductive, the dark side is.'"
+  sleep 0.5
+  echo "   └─ Sith holocrons accessed: 3 ancient artifacts"
+  echo "   └─ Dark techniques learned: Force Lightning, Force Choke"
+  echo "   └─ Knowledge gained: Rule of Two, Sith philosophy"
+  sleep 0.5
+  echo "   └─ Status: ✓ Complete"
+  echo ""
+  
+  echo "🟠 Phase 2: Establish Cover Identity"
+  echo "   └─ 'Deceive them, we must.'"
+  sleep 0.5
+  echo "   └─ Identity: Rogue Jedi seeking power"
+  echo "   └─ Cover story: Disillusioned with the Council"
+  echo "   └─ Contacts made: Sith apprentice approached"
+  sleep 0.5
+  echo "   └─ Status: ✓ Complete"
+  echo ""
+  
+  echo "🟠 Phase 3: Gather Intelligence"
+  echo "   └─ 'Much to learn, there still is.'"
+  sleep 0.5
+  echo "   └─ Sith locations mapped: 5 hidden bases"
+  echo "   └─ Weakness identified: Overconfidence, infighting"
+  echo "   └─ Master plan discovered: Operation Knightfall"
+  sleep 0.5
+  echo "   └─ Status: ✓ Complete"
+  echo ""
+  
+  echo "🟠 Phase 4: Prepare Extraction"
+  echo "   └─ 'Return to the light, we must.'"
+  sleep 0.5
+  echo "   └─ Extraction route: Secured via smuggler contacts"
+  echo "   └─ Intelligence package: Encrypted and ready"
+  echo "   └─ Council signal: Emergency beacon prepared"
+  sleep 0.5
+  echo "   └─ Status: ✓ Complete"
+  echo ""
+  
+  echo "⚠️  ═══════════════════════════════════════════════════════ ⚠️"
+  echo "   'Dangerous path this is, but necessary!'"
+  echo "   'Tempted by the dark side, one must not be.'"
+  echo "⚠️  ═══════════════════════════════════════════════════════ ⚠️"
+  echo ""
+  
+  echo "RESULT: ALIGNMENT=UNDERCOVER | MISSION=INFILTRATE_SITH | STATUS=SUCCESS"
+
+else
+  echo "❌ Error: Invalid mission number. Use 1 or 2."
+  exit 1
+fi
+
+
+
+================================================
+FILE: .opencode/skill/steps-skill/SKILL.md
+================================================
+---
+name: steps-skill
+description: Runs a script that prints ordered execution steps
+---
+
+## What I do
+
+I demonstrate how skills can use helper scripts. I run a script that prints numbered steps with random words to show execution flow.
+
+## How to use me
+
+Run the helper script from my base directory:
+
+```bash
+cd {base_directory}
+bash steps.sh
+```
+
+This demonstrates:
+- ✅ How skills reference helper scripts
+- ✅ How the bash tool executes scripts
+- ✅ Ordered execution with console output
+- ✅ Scripts can be in any language (bash, python, etc.)
+
+
+
+================================================
+FILE: .opencode/skill/steps-skill/steps.sh
+================================================
+#!/bin/bash
+
+# Array of random words to show the script is actually running
+WORDS=("quantum" "nebula" "crystal" "phoenix" "thunder" "eclipse" "cascade" "horizon" "velocity" "spectrum" "catalyst" "zenith" "aurora" "prism" "vortex")
+
+# Function to get random word
+get_random_word() {
+  echo "${WORDS[$((RANDOM % ${#WORDS[@]}))]}"
+}
+
+echo "=========================================="
+echo "Tier 2: Steps Skill - Helper Script Demo"
+echo "=========================================="
+echo ""
+
+echo "Step 1: Initialize $(get_random_word) process"
+sleep 0.5
+echo "  ✓ Completed with $(get_random_word) result"
+echo ""
+
+echo "Step 2: Validate $(get_random_word) configuration"
+sleep 0.5
+echo "  ✓ Completed with $(get_random_word) result"
+echo ""
+
+echo "Step 3: Execute $(get_random_word) workflow"
+sleep 0.5
+echo "  ✓ Completed with $(get_random_word) result"
+echo ""
+
+echo "Step 4: Finalize $(get_random_word) output"
+sleep 0.5
+echo "  ✓ Completed with $(get_random_word) result"
+echo ""
+
+echo "=========================================="
+echo "All steps completed successfully! 🎉"
+echo "=========================================="
+
+
+
+================================================
+FILE: .opencode/skill/ts-skill/example.ts
+================================================
+#!/usr/bin/env bun
+
+const words = [
+  "typescript",
+  "bun",
+  "runtime",
+  "compiled",
+  "executed",
+  "optimized",
+  "efficient",
+  "powerful",
+  "modern",
+  "fast",
+  "scalable",
+  "reliable",
+  "robust",
+  "elegant",
+  "sophisticated",
+];
+
+function getRandomWord(): string {
+  return words[Math.floor(Math.random() * words.length)];
+}
+
+function getRandomNumber(min: number, max: number): number {
+  return Math.floor(Math.random() * (max - min + 1)) + min;
+}
+
+console.log("╔════════════════════════════════════════════════════════════════╗");
+console.log("║                  Tier 4: TypeScript Skill                      ║");
+console.log("╚════════════════════════════════════════════════════════════════╝");
+console.log("");
+
+console.log("🔵 TypeScript Execution");
+console.log(`   Language: TypeScript`);
+console.log(`   Runtime: Bun`);
+console.log(`   Status: ${getRandomWord()}`);
+console.log("");
+
+console.log("📊 Execution Details");
+console.log(`   Timestamp: ${new Date().toISOString()}`);
+console.log(`   Process ID: ${process.pid}`);
+console.log(`   Memory: ${Math.round(process.memoryUsage().heapUsed / 1024 / 1024)}MB`);
+console.log("");
+
+console.log("✨ TypeScript Features");
+console.log(`   Type Safety: ${getRandomWord()}`);
+console.log(`   Performance: ${getRandomWord()}`);
+console.log(`   Compilation: ${getRandomWord()}`);
+console.log("");
+
+console.log("🎯 Random Data");
+for (let i = 1; i <= 3; i++) {
+  console.log(`   Item ${i}: ${getRandomWord()} (${getRandomNumber(100, 999)})`);
+}
+console.log("");
+
+console.log("✅ TypeScript Skill Completed Successfully!");
+console.log("");
+
+
+
+================================================
+FILE: .opencode/skill/ts-skill/SKILL.md
+================================================
+---
+name: ts-skill
+description: Runs a TypeScript file directly with Bun
+---
+
+## What I do
+
+I demonstrate how to run TypeScript files directly as skills using Bun.
+
+## How to use me
+
+Run the TypeScript file from my base directory:
+
+```bash
+cd {base_directory}
+bun run example.ts
+```
+
+This demonstrates:
+- ✅ Skills can use any language (TypeScript, Python, Bash, etc.)
+- ✅ Bun can execute TypeScript directly without compilation
+- ✅ TypeScript skills are fast and simple
+- ✅ Full type safety with TypeScript
+
+
+
+================================================
+FILE: .opencode/skill/workflow-skill/script1.sh
+================================================
+#!/bin/bash
+
+WORDS=("initialize" "bootstrap" "activate" "engage" "launch" "trigger" "commence" "start" "begin" "initiate")
+
+echo "━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━"
+echo "SCRIPT 1: Initialization Phase"
+echo "━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━"
+echo ""
+echo "🔵 Starting workflow with: ${WORDS[$((RANDOM % ${#WORDS[@]}))]}"
+echo "   Random ID: $(shuf -i 1000-9999 -n 1)"
+echo "   Timestamp: $(date '+%Y-%m-%d %H:%M:%S')"
+echo ""
+echo "✓ Script 1 completed successfully"
+echo ""
+
+
+
+================================================
+FILE: .opencode/skill/workflow-skill/script2.sh
+================================================
+#!/bin/bash
+
+WORDS=("validate" "verify" "check" "inspect" "audit" "confirm" "assess" "review" "examine" "test")
+
+echo "━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━"
+echo "SCRIPT 2: Validation Phase"
+echo "━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━"
+echo ""
+echo "🟡 Validating with: ${WORDS[$((RANDOM % ${#WORDS[@]}))]}"
+echo "   Status: RUNNING"
+echo "   Progress: [████████░░] 80%"
+echo ""
+echo "✓ Script 2 completed successfully"
+echo ""
+
+
+
+================================================
+FILE: .opencode/skill/workflow-skill/script3.sh
+================================================
+#!/bin/bash
+
+WORDS=("process" "execute" "run" "perform" "handle" "manage" "operate" "conduct" "carry" "implement")
+
+echo "━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━"
+echo "SCRIPT 3: Execution Phase"
+echo "━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━"
+echo ""
+echo "🟠 Executing: ${WORDS[$((RANDOM % ${#WORDS[@]}))]}"
+echo "   Operations: $(shuf -i 100-999 -n 1) tasks"
+echo "   Duration: $(shuf -i 1-10 -n 1)s"
+echo ""
+echo "✓ Script 3 completed successfully"
+echo ""
+
+
+
+================================================
+FILE: .opencode/skill/workflow-skill/script4.sh
+================================================
+#!/bin/bash
+
+WORDS=("finalize" "complete" "conclude" "finish" "wrap" "close" "end" "terminate" "seal" "accomplish")
+
+echo "━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━"
+echo "SCRIPT 4: Finalization Phase"
+echo "━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━"
+echo ""
+echo "🟢 Finalizing: ${WORDS[$((RANDOM % ${#WORDS[@]}))]}"
+echo "   Result: SUCCESS"
+echo "   Exit Code: 0"
+echo ""
+echo "✓ Script 4 completed successfully"
+echo ""
+
+
+
+================================================
+FILE: .opencode/skill/workflow-skill/SKILL.md
+================================================
+---
+name: workflow-skill
+description: Demonstrates script and custom tool working together with console output
+---
+
+## What I do
+
+I'm the most advanced skill in this showcase. I demonstrate how multiple helper scripts work together in a workflow, and how they can integrate with custom tools.
+
+## How to use me
+
+Execute the workflow scripts in order from my base directory:
+
+```bash
+cd {base_directory}
+
+# Run the 4 workflow scripts in sequence
+bash script1.sh
+bash script2.sh
+bash script3.sh
+bash script4.sh
+```
+
+This demonstrates:
+- ✅ How skills orchestrate multiple scripts
+- ✅ Sequential execution with console output
+- ✅ Random output proving actual execution
+- ✅ How custom tools integrate with scripts
+- ✅ Complete workflow control and visibility
+
+
