@@ -1,0 +1,45 @@
+{
+  "workflow": "refactor",
+  "description": "Careful workflow for refactorings with adversarial review",
+  "version": "1.0",
+  "phases": [
+    {
+      "name": "discovery",
+      "script": "phase-discovery.sh",
+      "parallel": true,
+      "description": "Understand current implementation before refactoring",
+      "timeout": 180
+    },
+    {
+      "name": "implementation",
+      "script": "phase-implementation.sh",
+      "parallel": false,
+      "description": "Refactor with extra care (maintain behavior)",
+      "timeout": 600
+    },
+    {
+      "name": "adversarial-review",
+      "script": "phase-adversarial-review.sh",
+      "parallel": true,
+      "description": "Multi-perspective review (security + quality + testing)",
+      "timeout": 240
+    },
+    {
+      "name": "docs-update",
+      "script": "phase-docs-update.sh",
+      "parallel": false,
+      "description": "Update documentation to reflect refactored architecture",
+      "timeout": 120
+    }
+  ],
+  "gates": {
+    "after_implementation": ["lint", "typecheck", "build", "test"],
+    "before_wrap": ["no-any", "e2e-trace", "docs-sync"]
+  },
+  "required_subagents": [
+    "repo-scout",
+    "builder",
+    "reviewer",
+    "docs-specialist"
+  ]
+}

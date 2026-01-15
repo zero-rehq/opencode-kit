@@ -1,0 +1,45 @@
+{
+  "workflow": "multi-repo-e2e",
+  "description": "Full E2E workflow for cross-repo features with complex dependencies",
+  "version": "1.0",
+  "phases": [
+    {
+      "name": "discovery",
+      "script": "phase-discovery.sh",
+      "parallel": true,
+      "description": "Launch repo-scouts for each target (parallel)",
+      "timeout": 180
+    },
+    {
+      "name": "contracts",
+      "script": "phase-contracts.sh",
+      "parallel": false,
+      "description": "Validate DTOs/endpoints cross-repo",
+      "timeout": 120
+    },
+    {
+      "name": "implementation",
+      "script": "phase-implementation.sh",
+      "parallel": false,
+      "description": "Implement with dependency order (back→proxy→fronts)",
+      "timeout": 600
+    },
+    {
+      "name": "integration",
+      "script": "phase-integration.sh",
+      "parallel": false,
+      "description": "Coordinate final integration and E2E validation",
+      "timeout": 300
+    }
+  ],
+  "gates": {
+    "after_implementation": ["lint", "typecheck", "build"],
+    "before_wrap": ["no-any", "e2e-trace"]
+  },
+  "required_subagents": [
+    "repo-scout",
+    "contract-keeper",
+    "builder",
+    "integration-builder"
+  ]
+}

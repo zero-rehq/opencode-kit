@@ -9,7 +9,28 @@ LOGDIR="$WORKSPACE_ROOT/worklog"; mkdir -p "$LOGDIR"
 LOGFILE="$LOGDIR/${DATE}_ci_${TASK}.md"
 
 TARGETS_FILE="$WORKSPACE_ROOT/.opencode/targets/${DATE}_${TASK}.txt"
-[[ -f "$TARGETS_FILE" ]] || { echo "Targets file not found: $TARGETS_FILE"; exit 2; }
+
+# Fallback: if no targets file, auto-detect repos with package.json
+if [[ ! -f "$TARGETS_FILE" ]]; then
+  echo "No targets file found. Auto-detecting repos with package.json..." >&2
+  TEMP_TARGETS="$(mktemp)"
+  find "$WORKSPACE_ROOT" -maxdepth 2 -name package.json -type f \
+    ! -path "*/node_modules/*" ! -path "*/.git/*" ! -path "*/.opencode/*" \
+    -exec dirname {} \; | sed "s|$WORKSPACE_ROOT/||" | sort -u > "$TEMP_TARGETS"
+
+  if [[ ! -s "$TEMP_TARGETS" ]]; then
+    echo "No repos with package.json found." >&2
+    rm -f "$TEMP_TARGETS"
+    echo "- No targets and no auto-detected repos." >> "$LOGFILE"
+    exit 0
+  fi
+
+  # Use temp targets for this run (don't create persistent targets file)
+  TARGETS_FILE="$TEMP_TARGETS"
+  CLEANUP_TEMP=true
+else
+  CLEANUP_TEMP=false
+fi
 
 {
   echo "# CI run for task: $TASK ($(date -Is))"
@@ -65,3 +86,6 @@ done <<< "$REPOS"
 
 echo "" >> "$LOGFILE"
 echo "Done." >> "$LOGFILE"
+
+# Cleanup temp targets if created
+[[ "$CLEANUP_TEMP" == "true" ]] && rm -f "$TARGETS_FILE"

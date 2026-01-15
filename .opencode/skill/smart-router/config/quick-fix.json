@@ -1,0 +1,29 @@
+{
+  "workflow": "quick-fix",
+  "description": "Fast workflow for isolated bugfixes in single repo",
+  "version": "1.0",
+  "phases": [
+    {
+      "name": "implementation",
+      "script": "phase-implementation.sh",
+      "parallel": false,
+      "description": "Direct implementation (skip discovery for speed)",
+      "timeout": 300
+    },
+    {
+      "name": "review",
+      "script": "phase-review.sh",
+      "parallel": false,
+      "description": "Fast review (gates + basic checks)",
+      "timeout": 120
+    }
+  ],
+  "gates": {
+    "after_implementation": ["lint", "typecheck", "build"],
+    "skip": ["e2e-trace"]
+  },
+  "required_subagents": [
+    "builder",
+    "reviewer"
+  ]
+}

@@ -23,19 +23,27 @@ permission:
 - E2E obligatorio: si cambias back, revisa front consumidor; si cambias front, revisa back/proxy.
 
 ## Workflow
-0) **E2E TRACE (antes de tocar código)**:
+
+0) **Query supermemory (antes de explorar)**:
+   - Si orchestrator no pasó contexto, query:
+     * "how to add API in <repo>"
+     * "patterns for <feature> in <repo>"
+     * "build commands for <repo>"
+   - Si fallas al query (supermemory no disponible): skip, continúa normal
+
+1) **E2E TRACE (antes de tocar código)**:
    - Front: componente + hook + client
    - Backend: endpoint + handler + service layer
    - Integración: proxy/storage/DB
    - Resultado esperado en UI
 
-1) Descubre rutas/archivos y confirma repos afectados.
-2) Plan corto (3–6 bullets) y ejecuta.
-3) Implementa respetando patrones existentes.
-4) Corre quality gates por repo (lint/format/typecheck/build).
-5) Escaneo no-any (heurístico):
+2) Descubre rutas/archivos y confirma repos afectados.
+3) Plan corto (3–6 bullets) y ejecuta.
+4) Implementa respetando patrones existentes.
+5) Corre quality gates por repo (lint/format/typecheck/build).
+6) Escaneo no-any (heurístico):
    - `rg -n "(:\s*any\b|\bas any\b|<any\b)" -S .`
-6) Pide gate.
+7) Pide gate.
 
 ## Output obligatorio (al final)
 ### E2E_TRACE
