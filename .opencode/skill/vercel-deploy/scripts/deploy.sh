@@ -1,0 +1,1 @@
+/home/bruno/FarmaconnectTicson/opencode-kit/docs/references/repos/agent-skills/skills/claude.ai/vercel-deploy-claimable/scripts/deploy.sh

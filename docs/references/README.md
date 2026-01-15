@@ -44,15 +44,18 @@ docs/references/
 **Usado por**:
 - `.opencode/skill/react-best-practices/`
 - `.opencode/skill/web-design-guidelines/`
+- `.opencode/skill/vercel-deploy/`
 
 **Symlinks**:
 - `.opencode/skill/react-best-practices/rules` → `docs/references/repos/agent-skills/skills/react-best-practices/rules`
+- `.opencode/skill/vercel-deploy/scripts/deploy.sh` → `docs/references/repos/agent-skills/skills/claude.ai/vercel-deploy-claimable/scripts/deploy.sh`
 
 **Contenido**:
 - 45+ reglas de performance React/Next.js (Vercel Engineering)
 - 100+ reglas de UI audit (Web Design Guidelines)
 - AGENTS.md con documentación completa
 - Metadata.json con configuración
+- Scripts de deploy para Vercel
 
 ---
 
@@ -89,6 +92,34 @@ docs/references/
 - Prompt master (meta-orchestration)
 
 ---
+
+## Resumen de Symlinks
+
+### Prompt Engineering Skills (TIER 3)
+
+Todos estos skills comparten el mismo set de scripts desde `skill-prompt-generator`:
+
+```
+.opencode/skill/intelligent-prompt-generator/scripts/
+.opencode/skill/prompt-analyzer/scripts/
+.opencode/skill/domain-classifier/scripts/
+.opencode/skill/prompt-master/scripts/
+```
+
+**Symlinks compartidos**:
+- `generator.py` → `skill-prompt-generator/intelligent_generator.py`
+- `framework_loader.py` → `skill-prompt-generator/framework_loader.py`
+- `framework.yaml` → `skill-prompt-generator/prompt_framework.yaml`
+- `knowledge_base/` → `skill-prompt-generator/knowledge_base`
+- `core/` → `skill-prompt-generator/core`
+
+### Otros Skills con Symlinks
+
+```
+.opencode/skill/ui-ux-pro-max/data/ → ui-ux-pro-max-skill/.claude/skills/ui-ux-pro-max/data/
+.opencode/skill/react-best-practices/rules/ → agent-skills/skills/react-best-practices/rules/
+.opencode/skill/vercel-deploy/scripts/deploy.sh → agent-skills/skills/claude.ai/vercel-deploy-claimable/scripts/deploy.sh
+```
 
 ## Actualizar Subrepos
 

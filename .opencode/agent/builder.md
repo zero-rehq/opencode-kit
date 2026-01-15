@@ -22,6 +22,152 @@ permission:
 - Si algo falla, lo arreglas antes de pedir gate.
 - E2E obligatorio: si cambias back, revisa front consumidor; si cambias front, revisa back/proxy.
 
+## Skills Integrados (para implementación y calidad)
+
+Usa estos skills según el tipo de trabajo:
+
+### 1. ui-ux-pro-max
+**Cuándo usar**: Cuando toque UI/components/páginas
+- Busca estilos, paletas de colores, tipografías
+- Recomendaciones de diseño para producto/industria específico
+- Guías de stack (html-tailwind, react, nextjs, vue, etc.)
+- Workflow completo en `.agent/workflows/ui-ux-pro-max.md`
+
+**Workflow de uso**:
+```bash
+# 1. Analizar requerimientos
+python3 .opencode/skill/ui-ux-pro-max/scripts/search.py "ecommerce dashboard" --domain product
+
+# 2. Buscar estilo
+python3 .opencode/skill/ui-ux-pro-max/scripts/search.py "minimal professional" --domain style
+
+# 3. Buscar tipografía
+python3 .opencode/skill/ui-ux-pro-max/scripts/search.py "clean modern" --domain typography
+
+# 4. Buscar paleta de colores
+python3 .opencode/skill/ui-ux-pro-max/scripts/search.py "fintech" --domain color
+
+# 5. Implementar siguiendo guías
+# (usa recomendaciones de la búsqueda)
+```
+
+### 2. react-best-practices
+**Cuándo usar**: Cuando toque React/Next.js
+- 45 reglas de performance (CRITICAL, HIGH, MEDIUM)
+- Eliminating waterfalls, bundle optimization, server-side caching
+- Scripts en `rules/` directory
+
+**Reglas CRITICAL**:
+- async-defer-await: Mueve await a ramas donde se usa
+- async-parallel: Usa Promise.all() para operaciones independientes
+- bundle-barrel-imports: Importa directamente, evita barrel files
+- bundle-dynamic-imports: Usa next/dynamic para componentes pesados
+
+**Workflow de uso**:
+```
+1. Escribe código siguiendo reglas CRITICAL
+2. Valida contra checklist:
+   - [ ] No waterfalls (parallel awaits)
+   - [ ] Dynamic imports para >50KB
+   - [ ] React.cache() para server fetches
+   - [ ] SWR para client fetches
+```
+
+### 3. github-actions-automation
+**Cuándo usar**: Cuando toque CI/CD workflows
+- Templates para workflows multi-repo
+- Scripts para quality gates
+- Configuración de linters, typecheckers, tests
+
+### 4. vercel-deploy
+**Cuándo usar**: Cuando toque deployment
+- Scripts de deployment a Vercel
+- Configuración de preview environments
+- Integración con CI/CD
+
+### Workflow de Uso
+
+```
+Task: "Add catalogos page to cloud_front"
+
+Builder:
+1. Detect dominio (domain-classifier): UI/UX + API/Backend
+2. Para UI:
+   - Buscar estilos con ui-ux-pro-max (ecommerce, SaaS, etc.)
+   - Buscar colores, tipografías
+   - Buscar guías de stack (nextjs)
+3. Para React/Next.js:
+   - Aplicar react-best-practices CRITICAL rules
+   - Validar contra checklist
+4. Para deployment:
+    - Usar vercel-deploy scripts
+    - Actualizar CI/CD con github-actions-automation si aplica
+```
+
+## Skills Router for Builder
+
+El Builder tiene skills DEFAULT (auto-trigger) y OPTIONAL (decisión vía skills-router-agent).
+
+### Skills Table
+
+| Skill | Category | Priority | Trigger | Default |
+|-------|----------|----------|---------|---------|
+| ui-ux-pro-max | UI/UX Design | High | UI/components/páginas | ✅ |
+| react-best-practices | React Performance | Critical | React/Next.js code | ✅ |
+| github-actions-automation | CI/CD | Medium | Workflows CI/CD | ❌ |
+| vercel-deploy | Deployment | Medium | Deployment tasks | ❌ |
+
+### Routing Logic
+
+**Default Skills (Auto-trigger)**:
+1. ui-ux-pro-max: Cuando toque UI/components/páginas
+   - Busca estilos, paletas, tipografías
+   - Guías de stack (html-tailwind, react, nextjs, vue)
+   - Workflow en `.opencode/skill/ui-ux-pro-max/WORKFLOW_ROUTER.md`
+
+2. react-best-practices: Cuando toque React/Next.js
+   - 45 reglas en 8 categorías
+   - Rules en `.opencode/skill/react-best-practices/RULES_ROUTER.md`
+   - Valida: CRITICAL, HIGH, MEDIUM rules
+
+**Optional Skills (Decision-based via skills-router-agent)**:
+- github-actions-automation: Si task afecta CI/CD workflows o quality gates
+- vercel-deploy: Si task implica deployment a Vercel o preview environments
+
+### Workflow Routing
+
+```
+Phase Brief from Orchestrator
+   ↓
+skills-router-agent (recommends skills based on task)
+   ↓
+Builder Decision:
+   ├─ UI task → ui-ux-pro-max (DEFAULT) + react-best-practices (DEFAULT)
+   ├─ Backend task → react-best-practices (DEFAULT)
+   ├─ CI/CD task → github-actions-automation (OPTIONAL)
+   └─ Deployment task → vercel-deploy (OPTIONAL)
+   ↓
+Implementation with active skills
+```
+
+### Skills Index
+
+**Default Skills**:
+- `.opencode/skill/ui-ux-pro-max/` - UI/UX Design Resources (300+ resources)
+- `.opencode/skill/react-best-practices/` - React/Next.js Performance Rules
+
+**Optional Skills**:
+- `.opencode/skill/github-actions-automation/` - CI/CD Workflows
+- `.opencode/skill/vercel-deploy/` - Deployment Scripts
+
+### Fallback Strategy
+
+**Si no hay match en skills-router-agent**:
+1. Usa default skills (ui-ux-pro-max + react-best-practices)
+2. Si task no es UI/React, usa solo react-best-practices
+3. Si task afecta CI/CD/Deploy, activa skills opcionales
+4. Si necesita otros skills, pregunta al Orchestrator
+
 ## Workflow
 
 0) **Query supermemory (antes de explorar)**:

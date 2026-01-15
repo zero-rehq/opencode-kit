@@ -1,6 +1,6 @@
 ---
 name: Microservice Multi-Repo E2E (Targets + Gates + E2E_TRACE)
-description: Workflow E2E multi-repo: targets → snapshot → implement → no-any + ci → E2E_TRACE → review → wrap.
+description: "Workflow E2E multi-repo: targets → snapshot → implement → no-any + ci → E2E_TRACE → review → wrap."
 compatibility: opencode
 ---
 

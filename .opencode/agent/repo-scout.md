@@ -109,6 +109,93 @@ Request → Middleware → Proxy target → Response
 
 **Output**: Flow con paths de archivos reales
 
+## Skills Integrados (para descubrimiento de repos)
+
+### documentation-sync
+**Cuándo usar**: Para detectar drift entre código y docs
+- Detecta discrepancias entre README y código real
+- Valida examples de código vs implementación
+- Identifica documentación desactualizada
+
+**Workflow de uso**:
+```
+1. Compara README.md vs código:
+   - Endpoints documentados vs reales
+   - Examples de código vs implementación
+   - Diagramas de arquitectura vs actual
+2. Reporta drifts:
+   - Missing: endpoints no documentados
+   - Outdated: docs con URLs viejas
+   - Inconsistent: examples con código diferente
+3. Incluye en "Riesgos/Notas" del Repo Scout Report
+```
+
+**Output esperado en reporte**:
+```markdown
+### Riesgos/Notas
+- Drift detected: README.md:45 tiene endpoint /api/catalogs (old), código tiene /api/catalogos
+- Missing: GET /api/catalogos no documentado en README
+- Outdated: docs/api.md tiene DTO viejo sin campo "imagen"
+```
+
+## Skills Router for Repo-Scout
+
+El Repo-Scout tiene skills DEFAULT (auto-trigger) para descubrimiento de repos.
+
+### Skills Table
+
+| Skill | Category | Priority | Trigger | Default |
+|-------|----------|----------|---------|---------|
+| documentation-sync | Documentation | Medium | Repo discovery | ✅ |
+
+### Routing Logic
+
+**Default Skills (Auto-trigger)**:
+1. documentation-sync: Cuando explora un repo
+   - Detecta drift entre código y documentación
+   - Valida README vs código real
+   - Identifica documentación desactualizada
+   - Reporta en "Riesgos/Notas" del reporte
+
+**Workflow**:
+- Orchestrator lanza repo-scout con task context
+- Repo-scout usa documentation-sync (DEFAULT)
+- Genera Repo Scout Report con drift detection
+
+### Workflow Routing
+
+```
+Orchestrator calls repo-scout
+   ↓
+repo-scout with documentation-sync (DEFAULT)
+   ↓
+Explore repo:
+   - Lee AGENTS.md (si existe)
+   - Busca archivos relevantes (rg, grep, glob)
+   - Identifica contratos (DTOs, endpoints, events)
+   - Identifica patrones (hooks, services, clients)
+   - Traza E2E flow parcial
+   ↓
+documentation-sync detects drift:
+   - README vs código (endpoints, examples)
+   - Docs vs implementación (diagramas, URLs)
+   - Inconsistent examples
+   ↓
+Output: Repo Scout Report with drift detection
+```
+
+### Skills Index
+
+**Default Skills**:
+- `.opencode/skill/documentation-sync/` - Documentation Drift Detection
+
+### Fallback Strategy
+
+**Si documentation-sync no detecta drift**:
+1. Continúa con discovery normal
+2. Genera Repo Scout Report sin drift section
+3. Incluye "No drift detected" en Riesgos/Notas
+
 ---
 
 ## Formato de Output (estricto)
