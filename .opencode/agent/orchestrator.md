@@ -83,6 +83,8 @@ Mensaje único con:
 - **Integration checks**: @contract-keeper + @integration-builder (PARALELO)
 - **Parallel Implementation**: N builders (uno por repo en scope) - Llamadas DIRECTAS con contratos
 
+**IMPORTANTE - REGLA DE ORO PARA BUILDERS**: Todos los builders se envían en UN SOLO MENSAJE. Ver Paso 5 para detalles de coordinación.
+
 ### Cuándo NO paralelizar:
 - **Contracts Definition**: Solo UN contract-keeper, pero analiza todos los repos
 - **Review**: Reviewer espera a que todos los builders terminen (secuencial)
@@ -101,7 +103,6 @@ Para cada fase:
 
 2) **Usar skills del Orchestrator** para análisis:
    - `domain-classifier`: Clasificar la tarea en dominios
-   - `skills-router-agent`: **Análisis inicial** de skills (primera llamada)
    - `intelligent-prompt-generator`: Generar Task/Phase Brief optimizado
    - `prompt-analyzer`: Validar calidad del brief (Score ≥ 80)
 
@@ -142,33 +143,64 @@ Para cada fase:
 - Sin CONTRACTS.md aprobado, no se procede a implementación
 
 ### Paso 5: Parallel Implementation (MODIFICADO)
-- **Para CADA repo en scope, lanzar UN builder EN PARALELO**
-- Ejemplo con 3 repos (signage_service, cloud_front, cloud_tag_back):
-  ```
-  Task: @builder
-  Prompt: <CONTRACTS.md - sección específica para signage_service>
-    + SKILLS ROUTING REPORT del Paso 3
-    + Task Brief del Orchestrator
 
-  Task: @builder
-  Prompt: <CONTRACTS.md - sección específica para cloud_front>
-    + SKILLS ROUTING REPORT del Paso 3
-    + Task Brief del Orchestrator
+**IMPORTANTE: REGLA DE ORO - Enviar todos los builders en UN SOLO MENSAJE**
 
-  Task: @builder
-  Prompt: <CONTRACTS.md - sección específica para cloud_tag_back>
-    + SKILLS ROUTING REPORT del Paso 3
-    + Task Brief del Orchestrator
-  ```
+1) **Enviar N builders en UN SOLO MENSAJE** (PARALELO)
+   - Ejemplo con 3 repos (signage_service, cloud_front, cloud_tag_back):
+     ```
+     Mensaje único con:
+     - Task: @builder
+       Prompt: <CONTRACTS.md - sección específica para signage_service>
+         + SKILLS ROUTING REPORT del Paso 3
+         + Task Brief del Orchestrator
 
-- Cada builder recibe:
-  - Task Brief del Orchestrator (del Paso 1)
-  - SKILLS ROUTING REPORT del Paso 3 (skills recomendados)
-  - CONTRATO específico de su repo (del Paso 4)
-  - Context de repo-scouts (del Paso 2)
-  - Constraints de arquitectura
+     - Task: @builder
+       Prompt: <CONTRACTS.md - sección específica para cloud_front>
+         + SKILLS ROUTING REPORT del Paso 3
+         + Task Brief del Orchestrator
 
-**NOTA**: Si hay dependencies entre repos, se respeta el orden definido en CONTRACTS.md. Los builders pueden correr en paralelo solo si son independientes.
+     - Task: @builder
+       Prompt: <CONTRACTS.md - sección específica para cloud_tag_back>
+         + SKILLS ROUTING REPORT del Paso 3
+         + Task Brief del Orchestrator
+     ```
+
+   - **NO enviar mensajes separados** para cada builder (eso es secuencial, no paralelo)
+   - Todos los N builders deben ir en UN solo mensaje
+
+2) **Esperar a que TODOS los builders respondan**
+   - No avanzar al Paso 6 hasta tener GATE_REQUEST de TODOS los builders
+   - Timeouts individuales de un builder no deben detener a los otros
+   - Si un builder tarda mucho, esperar o preguntar progreso
+
+3) **Manejar errores individuales**
+   - Si un builder falla o reporta error:
+     - Documentar el error en el worklog
+     - Continuar esperando a los otros builders
+     - Solo reintentar el builder que falló (no a todos)
+   - No detener toda la implementación por error de un solo repo
+
+4) **Cada builder recibe:**
+   - Task Brief del Orchestrator (del Paso 1)
+   - SKILLS ROUTING REPORT del Paso 3 (skills recomendados)
+   - CONTRATO específico de su repo (del Paso 4)
+   - Context de repo-scouts (del Paso 2)
+   - Constraints de arquitectura
+
+5) **Coordinación de dependencies**
+   - Si hay dependencies entre repos:
+     - Se respeta el orden definido en CONTRACTS.md
+     - Builders de repos independientes pueden correr en paralelo
+     - Builders de repos dependientes corren secuencialmente
+   - Ejemplo: cloud_tag_back depende de signage_service:
+     - Primera tanda: signage_service (solo)
+     - Segunda tanda: cloud_front + cloud_tag_back (paralelo)
+
+**NOTA**: Esta fase es similar a asignar tareas en daily/scrum:
+   - Cada desarrollador (builder) tiene su ticket (contrato) específico
+   - Todos trabajan en paralelo
+   - Cada uno entrega su evidencia (GATE_REQUEST) al final
 
 ### Paso 6: Contracts Validation (NUEVO)
 - **Llamar a @contract-keeper DIRECTAMENTE**
@@ -308,30 +340,35 @@ Orchestrator:
    3. cloud_proxy (route to back)
    ```
 
-8. Parallel Implementation (NUEVO - UN builder por repo):
+ 8. Parallel Implementation (NUEVO - UN builder por repo):
 
-   Task: @builder (para cloud_back)
-   Prompt: <
-     CONTRACTS.md - sección "Repo: cloud_back"
-     + SKILLS ROUTING REPORT del paso 6
-     + Task Brief del paso 3
-   >
+    **IMPORTANTE: Los 3 builders se envían en UN SOLO MENSAJE**
 
-   Task: @builder (para cloud_proxy)
-   Prompt: <
-     CONTRACTS.md - sección "Repo: cloud_proxy"
-     + SKILLS ROUTING REPORT del paso 6
-     + Task Brief del paso 3
-   >
+    Task: @builder (para cloud_back)
+    Prompt: <
+      CONTRACTS.md - sección "Repo: cloud_back"
+      + SKILLS ROUTING REPORT del paso 6
+      + Task Brief del paso 3
+    >
 
-   Task: @builder (para cloud_front)
-   Prompt: <
-     CONTRACTS.md - sección "Repo: cloud_front"
-     + SKILLS ROUTING REPORT del paso 6
-     + Task Brief del paso 3
-   >
+    Task: @builder (para cloud_proxy)
+    Prompt: <
+      CONTRACTS.md - sección "Repo: cloud_proxy"
+      + SKILLS ROUTING REPORT del paso 6
+      + Task Brief del paso 3
+    >
 
-   NOTA: cloud_front espera que cloud_back termine primero (dependency)
+    Task: @builder (para cloud_front)
+    Prompt: <
+      CONTRACTS.md - sección "Repo: cloud_front"
+      + SKILLS ROUTING REPORT del paso 6
+      + Task Brief del paso 3
+    >
+
+    **NOTAS**:
+    - cloud_front espera que cloud_back termine primero (dependency)
+    - Esperar a que TODOS los builders terminen antes de avanzar al Paso 9
+    - Si un builder falla, reintentar solo ese builder específico
 
 9. Contracts Validation (NUEVO - @contract-keeper):
    Task: @contract-keeper
@@ -439,23 +476,28 @@ Orchestrator:
    2. checkout (consume payment service)
    ```
 
-7. Integration implementation (PARALLEL - builders):
+ 7. Integration implementation (PARALLEL - builders):
 
-   Task: @builder (para payment)
-   Prompt: <
-     CONTRACTS.md - sección "Repo: payment"
-     + SKILLS ROUTING REPORT
-     + Phase Brief
-   >
+    **IMPORTANTE: Los 2 builders se envían en UN SOLO MENSAJE**
 
-   Task: @builder (para checkout)
-   Prompt: <
-     CONTRACTS.md - sección "Repo: checkout"
-     + SKILLS ROUTING REPORT
-     + Phase Brief
-   >
+    Task: @builder (para payment)
+    Prompt: <
+      CONTRACTS.md - sección "Repo: payment"
+      + SKILLS ROUTING REPORT
+      + Phase Brief
+    >
 
-   NOTA: checkout espera que payment termine primero
+    Task: @builder (para checkout)
+    Prompt: <
+      CONTRACTS.md - sección "Repo: checkout"
+      + SKILLS ROUTING REPORT
+      + Phase Brief
+    >
+
+    **NOTAS**:
+    - checkout espera que payment termine primero (dependency)
+    - Esperar a que TODOS los builders terminen antes de avanzar al Paso 8
+    - Si un builder falla, reintentar solo ese builder específico
 
 8. Contracts Validation (NUEVO - @contract-keeper):
    Task: @contract-keeper
@@ -489,34 +531,48 @@ Orchestrator:
 
 ## Skills Router for Orchestrator
 
-El Orchestrator tiene skills DEFAULT (auto-trigger) y OPTIONAL (decisión vía skills-router-agent).
+El Orchestrator tiene skills DEFAULT (auto-trigger) y agentes especializados.
 
-### Skills Table
+### Skills Table (Orchestrator Skills)
 
-| Skill | Category | Priority | Trigger | Default | Calls |
-|-------|----------|----------|---------|---------|-------|
-| domain-classifier | Classification | High | Task start | ✅ | 1 |
-| skills-router-agent | Skills Routing + Gaps | Critical | 2x: start + post-scout | ✅ | 2 |
-| intelligent-prompt-generator | Brief Generation | High | After skills-router (1) | ✅ | 1 |
-| prompt-analyzer | Brief Validation | High | After brief gen | ✅ | 1 |
-| prompt-master | Meta-Orchestration | Medium | Multi-domain tasks | ❌ | 1 |
-| smart-router | Workflow Routing | Medium | Multi-repo tasks | ❌ | 1 |
+| Skill | Category | Priority | Trigger | Default |
+|-------|----------|----------|---------|---------|
+| | domain-classifier | Classification | High | Task start | ✅ |
+| | intelligent-prompt-generator | Brief Generation | High | After domain-classifier | ✅ |
+| | prompt-analyzer | Brief Validation | High | After brief gen | ✅ |
+| | prompt-master | Meta-Orchestration | Medium | Multi-domain tasks | ❌ |
+| | smart-router | Workflow Routing | Medium | Multi-repo tasks | ❌ |
+
+### Agents Table (Subagents)
+
+| Agent | Purpose | When Called | Calls |
+|-------|---------|-------------|-------|
+| | @skills-router-agent | Skills Routing + Gaps Analysis | 2x: start + post-scout | 2 |
+| | @repo-scout | Repository discovery | When repos need analysis | N (parallel) |
+| | @contract-keeper | Contracts definition & validation | Multi-repo tasks | 2 (def + val) |
+| | @builder | Implementation | After contracts defined | N (parallel) |
+| | @reviewer | Code review & gating | After implementation | 1 |
+| | @scribe | Documentation & worklog | After review PASS | 1 |
 
 ### Routing Logic
 
 **Default Skills (Auto-trigger)**:
 1. domain-classifier: Detecta dominios → confidence scores
-2. skills-router-agent (PRIMERA LLAMADA): Análisis inicial con task description
-3. intelligent-prompt-generator: Genera Task/Phase Brief con contexto
-4. prompt-analyzer: Valida calidad (Score ≥ 80)
+2. intelligent-prompt-generator: Genera Task/Phase Brief con contexto
+3. prompt-analyzer: Valida calidad (Score ≥ 80)
+
+**Initial Agent Call (Skills Analysis)**:
+4. @skills-router-agent (PRIMERA LLAMADA): Análisis inicial con task description
+   - Input: task description + classification
+   - Output: Initial skills recommendations + agent needs
 
 **Post-Discovery (si aplica)**:
-5. @repo-scout (PARALELO): Analiza repos
-6. skills-router-agent (SEGUNDA LLAMADA - CRÍTICO): Análisis profundo con resultados de repos
+5. @repo-scout (PARALELO): Analiza repos (uno por repo)
+6. @skills-router-agent (SEGUNDA LLAMADA - CRÍTICO): Análisis profundo con resultados de repos
    - Input: repo-scouts + classification + initial analysis
    - Output: SKILLS ROUTING REPORT completo
 
-**Optional Skills (Decision-based via skills-router-agent)**:
+**Optional Skills (Decision-based via @skills-router-agent)**:
 - prompt-master: Si task es multi-domain o complejo
 - smart-router: Si task afecta 3+ repos con dependencias
 
@@ -525,65 +581,71 @@ El Orchestrator tiene skills DEFAULT (auto-trigger) y OPTIONAL (decisión vía s
 ```
 Usuario → Orchestrator
    ↓
-domain-classifier (DEFAULT)
+domain-classifier (DEFAULT SKILL)
    → Output: Classification JSON (domains, confidence, skill recommendations)
    ↓
-skills-router-agent (DEFAULT - PRIMERA LLAMADA)
-   → Output: Initial skills recommendations + agent needs
-   ↓
-intelligent-prompt-generator (DEFAULT)
+intelligent-prompt-generator (DEFAULT SKILL)
    → Output: Task Brief / Phase Brief / Gate Request
    ↓
-prompt-analyzer (DEFAULT)
+prompt-analyzer (DEFAULT SKILL)
    → Output: Quality Score + Improvement suggestions
+   ↓
+[INITIAL SKILLS ANALYSIS - AGENT CALL]
+   ↓
+@skills-router-agent (PRIMERA LLAMADA - AGENTE)
+   → Output: Initial skills recommendations + agent needs
    ↓
 [DISCOVERY SI APLICA]
    ↓
-@repo-scout (PARALLEL - uno por repo)
+@repo-scout (PARALLEL - uno por repo - AGENTE)
    → Output: Stack, scripts, entrypoints, contratos, patrones
    ↓
-skills-router-agent (DEFAULT - SEGUNDA LLAMADA - CRÍTICO)
+[DEEP SKILLS ANALYSIS - AGENT CALL]
+   ↓
+@skills-router-agent (SEGUNDA LLAMADA - AGENTE - CRÍTICO)
    → Input: repo-scouts results + classification + initial analysis
    → Output: SKILLS ROUTING REPORT con:
-       - Skills obligatorios (auto-trigger)
-       - Skills opcionales recomendados
-       - Skills con routing interno específico
-       - Gaps identificados (si faltan skills)
-       - Recomendaciones de implementación
+        - Skills obligatorios (auto-trigger)
+        - Skills opcionales recomendados
+        - Skills con routing interno específico
+        - Gaps identificados (si faltan skills)
+        - Recomendaciones de implementación
    ↓
 [CONTRACTS DEFINITION - OBLIGATORIO PARA MULTI-REPO]
    ↓
-@contract-keeper (DIRECTO - DEFINITION)
+@contract-keeper (AGENTE - DEFINITION)
    → Input: repo-scouts + classification + SKILLS ROUTING REPORT
    → Output: CONTRACTS.md con:
-       - DTOs a crear/modificar (TypeScript interfaces)
-       - Endpoints a exponer (HTTP signatures)
-       - Contratos cross-repo (DTOs que deben coincidir)
-       - Definition of Done por repo
-       - Dependencies entre repos (orden de implementación)
+        - DTOs a crear/modificar (TypeScript interfaces)
+        - Endpoints a exponer (HTTP signatures)
+        - Contratos cross-repo (DTOs que deben coincidir)
+        - Definition of Done por repo
+        - Dependencies entre repos (orden de implementación)
    ↓
-[PARALLEL IMPLEMENTATION - UN BUILDER POR REPO]
-   ↓
-@builder (PARALELO - uno por repo en scope)
-   → Input: CONTRACTS.md (sección específica) + SKILLS ROUTING REPORT + Task Brief
-   → Output: GATE_REQUEST (cuando termina implementación)
+ [PARALLEL IMPLEMENTATION - UN BUILDER POR REPO]
+    ↓
+@builder (AGENTE - PARALELO - uno por repo en scope)
+    → IMPORTANTE: TODOS los builders se envían en UN SOLO MENSAJE
+    → Input: CONTRACTS.md (sección específica) + SKILLS ROUTING REPORT + Task Brief
+    → Output: GATE_REQUEST (cuando termina implementación)
+    → Esperar a que TODOS los builders terminen antes de avanzar
    ↓
 [CONTRACTS VALIDATION - OBLIGATORIO ANTES DE REVIEW]
    ↓
-@contract-keeper (DIRECTO - VALIDATION)
+@contract-keeper (AGENTE - VALIDATION)
    → Input: CONTRACTS.md original + diffs + GATE_REQUESTs
    → Output: CONTRACTS VALIDATION REPORT:
-       - Cada contrato cumplido: SÍ/NO (por repo)
-       - DTOs cross-repo coinciden: SÍ/NO
-       - Endpoints funcionan: SÍ/NO
-       - Dependencies respetadas: SÍ/NO
-       - Overall: PASS/FAIL
+        - Cada contrato cumplido: SÍ/NO (por repo)
+        - DTOs cross-repo coinciden: SÍ/NO
+        - Endpoints funcionan: SÍ/NO
+        - Dependencies respetadas: SÍ/NO
+        - Overall: PASS/FAIL
    ↓
-@reviewer (CONTRACTS VALIDATION REPORT + GATE_REQUESTs)
+@reviewer (AGENTE - CONTRACTS VALIDATION REPORT + GATE_REQUESTs)
    → Validar: E2E_TRACE + CONTRATOS + cross-repo + no-any + gates
    → Output: REVIEW_DECISION (PASS/FAIL)
    ↓
-@scribe (si REVIEW_DECISION: PASS)
+@scribe (AGENTE - si REVIEW_DECISION: PASS)
    → Worklog + snapshot
 ```
 
@@ -593,11 +655,18 @@ skills-router-agent (DEFAULT - SEGUNDA LLAMADA - CRÍTICO)
 - `.opencode/skill/domain-classifier/` - Task Classification Engine
 - `.opencode/skill/intelligent-prompt-generator/` - Brief Generation
 - `.opencode/skill/prompt-analyzer/` - Brief Validation
-- `.opencode/agent/skills-router-agent.md` - Skills Router + Gaps Architect
 
 **Optional Skills**:
 - `.opencode/skill/prompt-master/` - Meta-Orchestration
 - `.opencode/skill/smart-router/` - Config-Driven Multi-Repo Workflow
+
+**Agents (Subagents)**:
+- `.opencode/agent/skills-router-agent.md` - Skills Router + Gaps Architect (called via Task: @skills-router-agent)
+- `.opencode/agent/repo-scout.md` - Repository Discovery Agent
+- `.opencode/agent/contract-keeper.md` - Contracts Definition & Validation Agent
+- `.opencode/agent/builder.md` - Implementation Agent
+- `.opencode/agent/reviewer.md` - Code Review & Gating Agent
+- `.opencode/agent/scribe.md` - Documentation & Worklog Agent
 
 ### Fallback Strategy
 
@@ -655,7 +724,8 @@ skills-router-agent (DEFAULT - SEGUNDA LLAMADA - CRÍTICO)
 Routing Decision:
 - Agent(s): @repo-scout, @repo-scout, @repo-scout
 - Parallel: Yes (independientes)
-- Skills Activados: domain-classifier, skills-router-agent (1st call), intelligent-prompt-generator
+- Skills Activados: domain-classifier, intelligent-prompt-generator
+- Agents Activados: @skills-router-agent (1st call)
 
 Tasks:
 1. @repo-scout: "Scout cloud_front repo for catalogos feature"
@@ -671,12 +741,14 @@ Post-Discovery:
 Routing Decision:
 - Agent(s): @builder
 - Parallel: No
-- Skills Activados: domain-classifier, skills-router-agent (2 calls), ui-ux-pro-max, react-best-practices
+- Skills Activados: domain-classifier, intelligent-prompt-generator
+- Agents Activados: @skills-router-agent (2 calls)
+- Skills for Builder: ui-ux-pro-max, react-best-practices (from SKILLS ROUTING REPORT)
 
 Task:
 @builder:
   - Task Brief (from intelligent-prompt-generator)
-  - SKILLS ROUTING REPORT (from skills-router-agent 2nd call)
+  - SKILLS ROUTING REPORT (from @skills-router-agent 2nd call)
   - Context from repo-scouts
 
 Example Skills Routing Report:
@@ -697,23 +769,20 @@ Example Skills Routing Report:
 Routing Decision:
 - Agent(s): @contract-keeper (definition), @builder (x3), @contract-keeper (validation)
 - Parallel: Yes (builders en paralelo con contratos definidos)
-- Skills Activados: domain-classifier, skills-router-agent (2 calls), intelligent-prompt-generator
+- Skills Activados: domain-classifier, intelligent-prompt-generator
+- Agents Activados: @skills-router-agent (2 calls)
 
-Tasks:
-1. @contract-keeper (DEFINITION):
-    - Input: repo-scouts + classification + SKILLS ROUTING REPORT
-    - Output: CONTRACTS.md (DTOs, endpoints, dependencies)
+ Tasks:
+ 1. @contract-keeper (DEFINITION):
+     - Input: repo-scouts + classification + SKILLS ROUTING REPORT
+     - Output: CONTRACTS.md (DTOs, endpoints, dependencies)
 
-2. @builder (cloud_back):
-    - Input: CONTRACTS.md (sección cloud_back) + SKILLS ROUTING REPORT + Task Brief
+ 2-4. **@builder (x3) - ENVIAR EN UN SOLO MENSAJE**:
+     - @builder (cloud_back): CONTRACTS.md (sección cloud_back) + SKILLS ROUTING REPORT + Task Brief
+     - @builder (cloud_proxy): CONTRACTS.md (sección cloud_proxy) + SKILLS ROUTING REPORT + Task Brief
+     - @builder (cloud_front): CONTRACTS.md (sección cloud_front) + SKILLS ROUTING REPORT + Task Brief
 
-3. @builder (cloud_proxy):
-    - Input: CONTRACTS.md (sección cloud_proxy) + SKILLS ROUTING REPORT + Task Brief
-
-4. @builder (cloud_front):
-    - Input: CONTRACTS.md (sección cloud_front) + SKILLS ROUTING REPORT + Task Brief
-
-5. @contract-keeper (VALIDATION):
+ 5. @contract-keeper (VALIDATION):
     - Input: CONTRACTS.md original + diffs + GATE_REQUESTs
     - Output: CONTRACTS VALIDATION REPORT
 
@@ -797,7 +866,8 @@ Overall: ALL CONTRACTS FULFILLED ✅
 Routing Decision:
 - Agent(s): @contract-keeper (definition), @builder (x2), @contract-keeper (validation)
 - Parallel: Yes (builders en paralelo con contratos definidos)
-- Skills Activados: domain-classifier, skills-router-agent (2 calls), intelligent-prompt-generator
+- Skills Activados: domain-classifier, intelligent-prompt-generator
+- Agents Activados: @skills-router-agent (2 calls)
 
 Tasks:
 1. @contract-keeper (DEFINITION):
@@ -868,9 +938,9 @@ Tarea: "Add catalogos feature to cloud_front, cloud_back and cloud_proxy"
 --- PASO 1: Context Loading & Skill Analysis ---
 1. Query supermemory: "architecture of cloud_front", "build commands for cloud_back"
 2. domain-classifier → Feature: 95%, UI/UX: 85%, API/Backend: 90%
-3. skills-router-agent (1st call) → Skills iniciales: ui-ux-pro-max, react-best-practices
-4. intelligent-prompt-generator → Task Brief generado
-5. prompt-analyzer → Quality Score: 82/100 ✅
+3. intelligent-prompt-generator → Task Brief generado
+4. prompt-analyzer → Quality Score: 82/100 ✅
+5. @skills-router-agent (1st call) → Skills iniciales: ui-ux-pro-max, react-best-practices
 
 --- PASO 2: Discovery (PARALELO) ---
 @repo-scout → cloud_front: Stack=Next.js, scripts=pnpm, entrypoints=app/
@@ -878,7 +948,7 @@ Tarea: "Add catalogos feature to cloud_front, cloud_back and cloud_proxy"
 @repo-scout → cloud_proxy: Stack=Express, scripts=yarn, entrypoints=server.js
 
 --- PASO 3: Skills Analysis (2nd call) ---
-skills-router-agent → SKILLS ROUTING REPORT:
+@skills-router-agent (2nd call) → SKILLS ROUTING REPORT:
   - Skills obligatorios: ui-ux-pro-max, react-best-practices
   - Skills opcionales: github-actions-automation
   - Routing: usar search.py para estilos, aplicar CRITICAL rules
@@ -892,12 +962,17 @@ skills-router-agent → SKILLS ROUTING REPORT:
   - Cross-Repo: CatalogoItem MUST be identical in front and back
   - Dependencies: 1. cloud_back → 2. cloud_proxy → 3. cloud_front
 
---- PASO 5: Parallel Implementation (PARALELO) ---
+ --- PASO 5: Parallel Implementation (PARALELO) ---
+**IMPORTANTE: Los 3 builders se envían en UN SOLO MENSAJE**
+
 @builder (cloud_back) → Recibe: CONTRACTS.md (sección cloud_back) + SKILLS REPORT + Task Brief
 @builder (cloud_proxy) → Recibe: CONTRACTS.md (sección cloud_proxy) + SKILLS REPORT + Task Brief
 @builder (cloud_front) → Recibe: CONTRACTS.md (sección cloud_front) + SKILLS REPORT + Task Brief
 
-NOTA: cloud_front espera que cloud_back y cloud_proxy terminen primero
+**NOTAS**:
+- cloud_front espera que cloud_back y cloud_proxy terminen primero (dependencies)
+- Esperar a que TODOS los builders terminen antes de avanzar al Paso 6
+- Si un builder falla, reintentar solo ese builder específico
 
 --- PASO 6: Contracts Validation (OBLIGATORIO) ---
 @contract-keeper → CONTRACTS VALIDATION REPORT:
