@@ -6,8 +6,6 @@ __pycache__/
 *.pyd
 .Python
 
-# Subrepos de referencia (clonados, no versionados)
-docs/references/repos/
 
 # Archives
 *.zip
