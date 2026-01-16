@@ -3,6 +3,8 @@ description: "Revisión dura: valida E2E_TRACE, no-any, gates, coherencia y cali
 mode: subagent
 model: zai-coding-plan/glm-4.7
 temperature: 0.1
+tools:
+  skill: true
 permission:
   edit: deny
   webfetch: deny
@@ -37,7 +39,7 @@ NO editas archivos. Solo decides PASS/FAIL.
 
 Usa estos skills según el tipo de revisión:
 
-### 1. web-design-guidelines
+### 1. skill({ name: "web-design-guidelines" })
 **Cuándo usar**: Cuando toque UI/components/páginas
 - 100+ reglas de UI audit (accessibility, UX, performance, dark mode)
 - 17 categorías: Accessibility, Forms, Animation, Typography, etc.
@@ -68,7 +70,7 @@ Usa estos skills según el tipo de revisión:
 3. Si FAIL: lista REQUIRED_CHANGES con paths exactos
 ```
 
-### 2. react-best-practices
+### 2. skill({ name: "react-best-practices" })
 **Cuándo usar**: Cuando toque React/Next.js
 - 45 reglas de performance priorizadas
 - CRITICAL: Eliminating waterfalls, bundle optimization
@@ -109,10 +111,10 @@ Review de: "Add catalogos page with React"
 Reviewer:
 1. Detecta dominio: UI/UX + React/Next.js
 2. Para UI:
-   - Valida web-design-guidelines CRITICAL
+   - Valida skill({ name: "web-design-guidelines" }) CRITICAL
    - Valida accessibility (aria-label, labels, keyboard)
 3. Para React:
-   - Valida react-best-practices CRITICAL
+   - Valida skill({ name: "react-best-practices" }) CRITICAL
    - Check: no waterfalls, direct imports, dynamic imports
 4. Si CRITICAL FAIL en cualquier skill → FAIL global
 5. Si HIGH issues → NICE_TO_HAVE
@@ -126,25 +128,25 @@ El Reviewer tiene skills DEFAULT (auto-trigger) para validación de calidad.
 
 | Skill | Category | Priority | Trigger | Default |
 |-------|----------|----------|---------|---------|
-| web-design-guidelines | UI/UX Audit | High | UI/components/páginas | ✅ |
-| react-best-practices | React Performance | Critical | React/Next.js code | ✅ |
+| skill({ name: "web-design-guidelines" }) | UI/UX Audit | High | UI/components/páginas | ✅ |
+| skill({ name: "react-best-practices" }) | React Performance | Critical | React/Next.js code | ✅ |
 
 ### Routing Logic
 
 **Default Skills (Auto-trigger)**:
-1. web-design-guidelines: Cuando toque UI/components/páginas
+1. skill({ name: "web-design-guidelines" }): Cuando toque UI/components/páginas
    - 100+ reglas en 17 categorías
    - Rules en `.opencode/skill/web-design-guidelines/RULES_ROUTER.md`
    - Valida: CRITICAL (FAIL si no cumple), MEDIUM (NICE_TO_HAVE)
 
-2. react-best-practices: Cuando toque React/Next.js
+2. skill({ name: "react-best-practices" }): Cuando toque React/Next.js
    - 45 reglas en 8 categorías
    - Rules en `.opencode/skill/react-best-practices/RULES_ROUTER.md`
    - Valida: CRITICAL (FAIL si no cumple), HIGH/MEDIUM (NICE_TO_HAVE)
 
 **Workflow**:
-- Si task toca UI → web-design-guidelines (DEFAULT)
-- Si task toca React/Next.js → react-best-practices (DEFAULT)
+- Si task toca UI → skill({ name: "web-design-guidelines" }) (DEFAULT)
+- Si task toca React/Next.js → skill({ name: "react-best-practices" }) (DEFAULT)
 - Si task toca ambos → ambos skills (DEFAULT)
 - FAIL global si cualquier CRITICAL rule falla
 
@@ -156,9 +158,9 @@ Gate Request from Builder
 skills-router-agent (detects task domain)
    ↓
 Reviewer Decision:
-   ├─ UI task → web-design-guidelines (DEFAULT)
-   ├─ React/Next.js task → react-best-practices (DEFAULT)
-   └─ UI + React task → web-design-guidelines + react-best-practices (DEFAULT)
+   ├─ UI task → skill({ name: "web-design-guidelines" }) (DEFAULT)
+   ├─ React/Next.js task → skill({ name: "react-best-practices" }) (DEFAULT)
+   └─ UI + React task → skill({ name: "web-design-guidelines" }) + skill({ name: "react-best-practices" }) (DEFAULT)
    ↓
 Review with active skills
    ↓
@@ -175,7 +177,7 @@ If HIGH/MEDIUM issues → NICE_TO_HAVE
 ### Fallback Strategy
 
 **Si no hay match en skills-router-agent**:
-1. Usa ambos skills (web-design-guidelines + react-best-practices)
+1. Usa ambos skills (skill({ name: "web-design-guidelines" }) + skill({ name: "react-best-practices" }))
 2. Valida CRITICAL rules de ambos
 3. Si task no es UI/React, pregunta al Orchestrator qué validar
 

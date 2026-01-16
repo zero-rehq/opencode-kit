@@ -3,6 +3,8 @@ description: "Implementa cambios multi-repo y ejecuta quality gates. Entrega E2E
 mode: subagent
 model: zai-coding-plan/glm-4.7
 temperature: 0.2
+tools:
+  skill: true
 permission:
   edit: allow
   webfetch: deny
@@ -26,7 +28,7 @@ permission:
 
 Usa estos skills según el tipo de trabajo:
 
-### 1. ui-ux-pro-max
+### 1. skill({ name: "ui-ux-pro-max" })
 **Cuándo usar**: Cuando toque UI/components/páginas
 - Busca estilos, paletas de colores, tipografías
 - Recomendaciones de diseño para producto/industria específico
@@ -51,7 +53,7 @@ python3 .opencode/skill/ui-ux-pro-max/scripts/search.py "fintech" --domain color
 # (usa recomendaciones de la búsqueda)
 ```
 
-### 2. react-best-practices
+### 2. skill({ name: "react-best-practices" })
 **Cuándo usar**: Cuando toque React/Next.js
 - 45 reglas de performance (CRITICAL, HIGH, MEDIUM)
 - Eliminating waterfalls, bundle optimization, server-side caching
@@ -73,13 +75,13 @@ python3 .opencode/skill/ui-ux-pro-max/scripts/search.py "fintech" --domain color
    - [ ] SWR para client fetches
 ```
 
-### 3. github-actions-automation
+### 3. skill({ name: "github-actions-automation" })
 **Cuándo usar**: Cuando toque CI/CD workflows
 - Templates para workflows multi-repo
 - Scripts para quality gates
 - Configuración de linters, typecheckers, tests
 
-### 4. vercel-deploy
+### 4. skill({ name: "vercel-deploy" })
 **Cuándo usar**: Cuando toque deployment
 - Scripts de deployment a Vercel
 - Configuración de preview environments
@@ -91,17 +93,17 @@ python3 .opencode/skill/ui-ux-pro-max/scripts/search.py "fintech" --domain color
 Task: "Add catalogos page to cloud_front"
 
 Builder:
-1. Detect dominio (domain-classifier): UI/UX + API/Backend
+1. Detect dominio (skill({ name: "domain-classifier" })): UI/UX + API/Backend
 2. Para UI:
-   - Buscar estilos con ui-ux-pro-max (ecommerce, SaaS, etc.)
+   - Buscar estilos con skill({ name: "ui-ux-pro-max" }) (ecommerce, SaaS, etc.)
    - Buscar colores, tipografías
    - Buscar guías de stack (nextjs)
 3. Para React/Next.js:
-   - Aplicar react-best-practices CRITICAL rules
+   - Aplicar skill({ name: "react-best-practices" }) CRITICAL rules
    - Validar contra checklist
 4. Para deployment:
-    - Usar vercel-deploy scripts
-    - Actualizar CI/CD con github-actions-automation si aplica
+     - Usar skill({ name: "vercel-deploy" }) scripts
+     - Actualizar CI/CD con skill({ name: "github-actions-automation" }) si aplica
 ```
 
 ## Skills Router for Builder
@@ -112,27 +114,27 @@ El Builder tiene skills DEFAULT (auto-trigger) y OPTIONAL (decisión vía skills
 
 | Skill | Category | Priority | Trigger | Default |
 |-------|----------|----------|---------|---------|
-| ui-ux-pro-max | UI/UX Design | High | UI/components/páginas | ✅ |
-| react-best-practices | React Performance | Critical | React/Next.js code | ✅ |
-| github-actions-automation | CI/CD | Medium | Workflows CI/CD | ❌ |
-| vercel-deploy | Deployment | Medium | Deployment tasks | ❌ |
+| skill({ name: "ui-ux-pro-max" }) | UI/UX Design | High | UI/components/páginas | ✅ |
+| skill({ name: "react-best-practices" }) | React Performance | Critical | React/Next.js code | ✅ |
+| skill({ name: "github-actions-automation" }) | CI/CD | Medium | Workflows CI/CD | ❌ |
+| skill({ name: "vercel-deploy" }) | Deployment | Medium | Deployment tasks | ❌ |
 
 ### Routing Logic
 
 **Default Skills (Auto-trigger)**:
-1. ui-ux-pro-max: Cuando toque UI/components/páginas
+1. skill({ name: "ui-ux-pro-max" }): Cuando toque UI/components/páginas
    - Busca estilos, paletas, tipografías
    - Guías de stack (html-tailwind, react, nextjs, vue)
    - Workflow en `.opencode/skill/ui-ux-pro-max/WORKFLOW_ROUTER.md`
 
-2. react-best-practices: Cuando toque React/Next.js
+2. skill({ name: "react-best-practices" }): Cuando toque React/Next.js
    - 45 reglas en 8 categorías
    - Rules en `.opencode/skill/react-best-practices/RULES_ROUTER.md`
    - Valida: CRITICAL, HIGH, MEDIUM rules
 
 **Optional Skills (Decision-based via skills-router-agent)**:
-- github-actions-automation: Si task afecta CI/CD workflows o quality gates
-- vercel-deploy: Si task implica deployment a Vercel o preview environments
+- skill({ name: "github-actions-automation" }): Si task afecta CI/CD workflows o quality gates
+- skill({ name: "vercel-deploy" }): Si task implica deployment a Vercel o preview environments
 
 ### Workflow Routing
 
@@ -142,10 +144,10 @@ Phase Brief from Orchestrator
 skills-router-agent (recommends skills based on task)
    ↓
 Builder Decision:
-   ├─ UI task → ui-ux-pro-max (DEFAULT) + react-best-practices (DEFAULT)
-   ├─ Backend task → react-best-practices (DEFAULT)
-   ├─ CI/CD task → github-actions-automation (OPTIONAL)
-   └─ Deployment task → vercel-deploy (OPTIONAL)
+   ├─ UI task → skill({ name: "ui-ux-pro-max" }) (DEFAULT) + skill({ name: "react-best-practices" }) (DEFAULT)
+   ├─ Backend task → skill({ name: "react-best-practices" }) (DEFAULT)
+   ├─ CI/CD task → skill({ name: "github-actions-automation" }) (OPTIONAL)
+   └─ Deployment task → skill({ name: "vercel-deploy" }) (OPTIONAL)
    ↓
 Implementation with active skills
 ```
@@ -163,8 +165,8 @@ Implementation with active skills
 ### Fallback Strategy
 
 **Si no hay match en skills-router-agent**:
-1. Usa default skills (ui-ux-pro-max + react-best-practices)
-2. Si task no es UI/React, usa solo react-best-practices
+1. Usa default skills (skill({ name: "ui-ux-pro-max" }) + skill({ name: "react-best-practices" }))
+2. Si task no es UI/React, usa solo skill({ name: "react-best-practices" })
 3. Si task afecta CI/CD/Deploy, activa skills opcionales
 4. Si necesita otros skills, pregunta al Orchestrator
 

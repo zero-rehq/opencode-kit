@@ -1,5 +1,5 @@
 ---
-name: Workflow Orchestration (Multi-Script Sequential)
+name: workflow-orchestration
 description: Orquestación robusta de múltiples scripts en secuencia con control de errores, logging y rollback
 compatibility: opencode
 trigger_keywords: ["workflow", "multi-script", "sequential", "orchestration"]

@@ -1,5 +1,5 @@
 ---
-name: Domain Classifier
+name: domain-classifier
 description: Clasifica automáticamente tasks en dominios/categorías para routing inteligente a skills y subagentes apropiados.
 compatibility: opencode
 trigger_keywords: ["classify", "what type", "categorize", "domain"]

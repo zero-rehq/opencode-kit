@@ -3,6 +3,8 @@ description: "Docs specialist: detecta drift entre código y docs, mantiene READ
 mode: subagent
 model: zai-coding-plan/glm-4.7
 temperature: 0.2
+tools:
+  skill: true
 permission:
   edit: allow
   webfetch: deny
@@ -102,7 +104,7 @@ Nuevo flow agrega: cloud_front → ftp_proxy
 
 ## Skills Integrados
 
-Usa **documentation-sync** skill (de SkillsMP) para detección automática.
+Usa **skill({ name: "documentation-sync" })** (de SkillsMP) para detección automática.
 
 ## Reglas
 

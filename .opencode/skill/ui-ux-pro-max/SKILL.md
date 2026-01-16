@@ -1,5 +1,5 @@
 ---
-name: UI/UX Pro Max (Design Intelligence)
+name: ui-ux-pro-max
 description: 57 UI styles + 95 color palettes + 56 font pairings + 24 charts + 98 UX guidelines. Motor BM25 para búsqueda inteligente.
 compatibility: opencode
 trigger_keywords: ["design", "UI", "UX", "landing page", "dashboard", "color palette", "typography"]

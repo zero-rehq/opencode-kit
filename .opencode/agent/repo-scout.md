@@ -3,6 +3,8 @@ description: "Repo discovery: archivos relevantes, contratos, patrones, E2E flow
 mode: subagent
 model: zai-coding-plan/glm-4.7
 temperature: 0.2
+tools:
+  skill: true
 permission:
   edit: deny
   webfetch: deny
@@ -111,7 +113,7 @@ Request → Middleware → Proxy target → Response
 
 ## Skills Integrados (para descubrimiento de repos)
 
-### documentation-sync
+### skill({ name: "documentation-sync" })
 **Cuándo usar**: Para detectar drift entre código y docs
 - Detecta discrepancias entre README y código real
 - Valida examples de código vs implementación
@@ -146,12 +148,12 @@ El Repo-Scout tiene skills DEFAULT (auto-trigger) para descubrimiento de repos.
 
 | Skill | Category | Priority | Trigger | Default |
 |-------|----------|----------|---------|---------|
-| documentation-sync | Documentation | Medium | Repo discovery | ✅ |
+| skill({ name: "documentation-sync" }) | Documentation | Medium | Repo discovery | ✅ |
 
 ### Routing Logic
 
 **Default Skills (Auto-trigger)**:
-1. documentation-sync: Cuando explora un repo
+1. skill({ name: "documentation-sync" }): Cuando explora un repo
    - Detecta drift entre código y documentación
    - Valida README vs código real
    - Identifica documentación desactualizada
@@ -159,7 +161,7 @@ El Repo-Scout tiene skills DEFAULT (auto-trigger) para descubrimiento de repos.
 
 **Workflow**:
 - Orchestrator lanza repo-scout con task context
-- Repo-scout usa documentation-sync (DEFAULT)
+- Repo-scout usa skill({ name: "documentation-sync" }) (DEFAULT)
 - Genera Repo Scout Report con drift detection
 
 ### Workflow Routing
@@ -167,7 +169,7 @@ El Repo-Scout tiene skills DEFAULT (auto-trigger) para descubrimiento de repos.
 ```
 Orchestrator calls repo-scout
    ↓
-repo-scout with documentation-sync (DEFAULT)
+repo-scout with skill({ name: "documentation-sync" }) (DEFAULT)
    ↓
 Explore repo:
    - Lee AGENTS.md (si existe)
@@ -176,7 +178,7 @@ Explore repo:
    - Identifica patrones (hooks, services, clients)
    - Traza E2E flow parcial
    ↓
-documentation-sync detects drift:
+skill({ name: "documentation-sync" }) detects drift:
    - README vs código (endpoints, examples)
    - Docs vs implementación (diagramas, URLs)
    - Inconsistent examples
@@ -191,7 +193,7 @@ Output: Repo Scout Report with drift detection
 
 ### Fallback Strategy
 
-**Si documentation-sync no detecta drift**:
+**Si skill({ name: "documentation-sync" }) no detecta drift**:
 1. Continúa con discovery normal
 2. Genera Repo Scout Report sin drift section
 3. Incluye "No drift detected" en Riesgos/Notas

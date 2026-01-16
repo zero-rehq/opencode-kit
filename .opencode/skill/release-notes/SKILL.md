@@ -1,5 +1,5 @@
 ---
-name: Release Notes (Changelog Generator)
+name: release-notes
 description: Genera changelog profesional + GitHub release notes desde commits y worklog
 compatibility: opencode
 trigger_keywords: ["release", "changelog", "version", "notes"]

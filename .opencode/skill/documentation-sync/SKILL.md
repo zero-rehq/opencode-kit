@@ -1,5 +1,5 @@
 ---
-name: Documentation Sync (Drift Detection)
+name: documentation-sync
 description: Detecta drift entre código y documentación. Valida que README, docs, ejemplos y diagramas estén sincronizados con el código actual.
 compatibility: opencode
 trigger_keywords: ["documentation", "docs", "drift", "outdated", "sync"]

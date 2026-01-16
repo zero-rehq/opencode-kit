@@ -3,6 +3,8 @@ description: "Contract validator: valida DTOs/endpoints/eventos cross-repo (READ
 mode: subagent
 model: zai-coding-plan/glm-4.7
 temperature: 0.1
+tools:
+  skill: true
 permission:
   edit: deny
   webfetch: deny

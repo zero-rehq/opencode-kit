@@ -1,5 +1,5 @@
 ---
-name: Prompt Master
+name: prompt-master
 description: Meta-skill que orquesta todos los skills de prompt engineering y routing. Auto-selección y coordinación de skills basada en domain classification.
 compatibility: opencode
 trigger_keywords: ["auto", "smart routing", "best workflow", "optimize workflow"]

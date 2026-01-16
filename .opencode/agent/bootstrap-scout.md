@@ -3,6 +3,8 @@ description: "Bootstrap scout: analiza UN repo para generar AGENTS.md (READ-ONLY
 mode: subagent
 model: zai-coding-plan/glm-4.7
 temperature: 0.2
+tools:
+  skill: true
 permission:
   edit: allow  # Necesita crear AGENTS.md
   webfetch: deny
@@ -132,12 +134,12 @@ El Bootstrap-Scout tiene skills DEFAULT (auto-trigger) para análisis de repos.
 
 | Skill | Category | Priority | Trigger | Default |
 |-------|----------|----------|---------|---------|
-| prompt-generator (bridge) | Prompt Engineering | High | Bootstrap tasks | ✅ |
+| skill({ name: "prompt-generator" }) | Prompt Engineering | High | Bootstrap tasks | ✅ |
 
 ### Routing Logic
 
 **Default Skills (Auto-trigger)**:
-1. prompt-generator (bridge): Cuando genera AGENTS.md
+1. skill({ name: "prompt-generator" }): Cuando genera AGENTS.md
    - Puente al skill-prompt-generator subrepo
    - Scripts compartidos en `.opencode/skill/*/scripts/`
    - Genera prompts optimizados para análisis de repos
@@ -145,7 +147,7 @@ El Bootstrap-Scout tiene skills DEFAULT (auto-trigger) para análisis de repos.
 
 **Workflow**:
 - Orchestrator lanza bootstrap-scout para repo
-- Bootstrap-scout usa prompt-generator (bridge) (DEFAULT)
+- Bootstrap-scout usa skill({ name: "prompt-generator" }) (DEFAULT)
 - Genera AGENTS.md con metadata del repo
 
 ### Workflow Routing
@@ -153,7 +155,7 @@ El Bootstrap-Scout tiene skills DEFAULT (auto-trigger) para análisis de repos.
 ```
 Orchestrator calls bootstrap-scout
    ↓
-bootstrap-scout with prompt-generator (bridge) (DEFAULT)
+bootstrap-scout with skill({ name: "prompt-generator" }) (DEFAULT)
    ↓
 Analyze repo:
    - Detect stack (package.json, Cargo.toml, go.mod)
@@ -162,7 +164,7 @@ Analyze repo:
    - Read README (descripción)
    - Detect special features (monorepo, tests, CI)
    ↓
-Generate AGENTS.md using prompt-generator (bridge)
+Generate AGENTS.md using skill({ name: "prompt-generator" })
    ↓
 Output: AGENTS.md with repo metadata
 ```
@@ -180,7 +182,7 @@ Output: AGENTS.md with repo metadata
 
 ### Fallback Strategy
 
-**Si prompt-generator (bridge) falla**:
+**Si skill({ name: "prompt-generator" }) falla**:
 1. Genera AGENTS.md manualmente con template
 2. Usa información detectada del repo
 3. Si no puede detectar algo, escribe "Unknown" (no fail)

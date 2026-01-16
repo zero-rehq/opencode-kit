@@ -1,5 +1,5 @@
 ---
-name: Vercel Deploy (Preview Deployments)
+name: vercel-deploy
 description: Deploy aplicaciones a Vercel directamente desde conversación. Auto-detecta 40+ frameworks.
 compatibility: opencode
 trigger_keywords: ["deploy", "vercel", "preview", "production"]

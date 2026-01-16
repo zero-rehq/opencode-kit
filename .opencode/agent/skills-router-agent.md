@@ -3,6 +3,8 @@ description: "Skills routing specialist: analiza tasks, revisa repo-scouts y gen
 mode: subagent
 model: zai-coding-plan/glm-4.7
 temperature: 0.2
+tools:
+  skill: true
 permission:
   edit: deny
   webfetch: deny
@@ -38,7 +40,7 @@ Tu trabajo:
 ```markdown
 ## Domain Classification
 
-Llamar a skill: domain-classifier
+Llamar a skill: skill({ name: "domain-classifier" })
 
 Input: Task description
 Output: JSON con classification + confidence score
@@ -135,9 +137,9 @@ Output: SKILLS ROUTING REPORT (ver formato abajo)
 ### Skills Recommendation
 
 #### OBLIGATORIOS (Auto-Trigger)
-1. ✅ **domain-classifier** (ya ejecutado)
-2. ✅ **intelligent-prompt-generator** (para brief)
-3. ✅ **prompt-analyzer** (para calidad)
+1. ✅ **skill({ name: "domain-classifier" })** (ya ejecutado)
+2. ✅ **skill({ name: "intelligent-prompt-generator" })** (para brief)
+3. ✅ **skill({ name: "prompt-analyzer" })** (para calidad)
 
 #### OPCIONALES (Recommendation Priority: HIGH/MEDIUM/LOW)
 Lista de skills opcionales con:

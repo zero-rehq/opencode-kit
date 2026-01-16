@@ -1,5 +1,5 @@
 ---
-name: React Best Practices (Vercel Engineering)
+name: react-best-practices
 description: 45+ reglas de performance para React/Next.js desde Vercel Engineering
 compatibility: opencode
 trigger_keywords: ["react", "next.js", "performance", "optimization", "bundle"]

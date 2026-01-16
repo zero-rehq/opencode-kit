@@ -1,5 +1,5 @@
 ---
-name: Web Design Guidelines (Vercel Labs)
+name: web-design-guidelines
 description: 100+ reglas de UI audit para accessibility, UX y performance
 compatibility: opencode
 trigger_keywords: ["review UI", "check accessibility", "audit design", "UX", "best practices"]

@@ -1,5 +1,5 @@
 ---
-name: API Documentation Generator
+name: api-documentation-generator
 description: Genera documentación de API OpenAPI/Swagger desde código (TypeScript, Express, Next.js).
 compatibility: opencode
 ---

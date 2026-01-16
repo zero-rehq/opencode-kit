@@ -1,5 +1,5 @@
 ---
-name: Prompt Generator (bridge)
+name: prompt-generator
 description: Puente para usar el Prompt Generator (skillsmp) para generar prompts largos/consistentes para tareas E2E.
 compatibility: opencode
 ---

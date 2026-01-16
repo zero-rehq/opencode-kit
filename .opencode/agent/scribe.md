@@ -3,6 +3,8 @@ description: "Trazabilidad: changelog + nota para Jira (sin tocar código)."
 mode: subagent
 model: zai-coding-plan/glm-4.7
 temperature: 0.2
+tools:
+  skill: true
 permission:
   edit: deny
   webfetch: deny
@@ -33,7 +35,7 @@ Si falta info, NO inventes.
 
 ## Skills Integrados (para changelog y documentación)
 
-### release-notes
+### skill({ name: "release-notes" })
 **Cuándo usar**: Para generar changelog profesional
 - Genera changelog desde commits + worklog
 - Formato estándar para release notes
@@ -121,19 +123,19 @@ El Scribe tiene skills DEFAULT (auto-trigger) para changelog y documentación.
 
 | Skill | Category | Priority | Trigger | Default |
 |-------|----------|----------|---------|---------|
-| release-notes | Documentation | High | Post-task wrap | ✅ |
+| skill({ name: "release-notes" }) | Documentation | High | Post-task wrap | ✅ |
 
 ### Routing Logic
 
 **Default Skills (Auto-trigger)**:
-1. release-notes: Cuando se complete una tarea (post-task wrap)
+1. skill({ name: "release-notes" }): Cuando se complete una tarea (post-task wrap)
    - Genera changelog profesional desde commits + worklog
    - Categorías: Added, Changed, Fixed, Deprecated, Removed, Security
    - Formato estándar para release notes
    - Script en `.opencode/skill/release-notes/scripts/`
 
 **Workflow**:
-- Builder entrega evidencia → Scribe usa release-notes (DEFAULT)
+- Builder entrega evidencia → Scribe usa skill({ name: "release-notes" }) (DEFAULT)
 - Genera CHANGELOG + TECH_NOTES + JIRA_COMMENT
 - Guarda aprendizajes en supermemory (si disponible)
 
@@ -146,7 +148,7 @@ Orchestrator calls Scribe with:
    - E2E_TRACE + PHASE_SUMMARY + COMMANDS_RUN
    - REVIEW_DECISION
    ↓
-Scribe with release-notes (DEFAULT)
+Scribe with skill({ name: "release-notes" }) (DEFAULT)
    ↓
 Generate outputs:
    - CHANGELOG (product-oriented)
@@ -163,7 +165,7 @@ Save to supermemory (if available)
 
 ### Fallback Strategy
 
-**Si release-notes falla**:
+**Si skill({ name: "release-notes" }) falla**:
 1. Genera CHANGELOG manualmente con formato markdown
 2. Bullets cortos orientados a producto/negocio
 3. TECH_NOTES con archivos clave, decisiones, edge cases

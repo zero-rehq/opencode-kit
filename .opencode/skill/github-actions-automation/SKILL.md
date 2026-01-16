@@ -1,5 +1,5 @@
 ---
-name: GitHub Actions Automation (CI/CD)
+name: github-actions-automation
 description: Crear y optimizar workflows de CI/CD multi-repo con GitHub Actions
 compatibility: opencode
 trigger_keywords: ["github actions", "ci/cd", "workflow", "automation"]

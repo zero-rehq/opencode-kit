@@ -1,5 +1,5 @@
 ---
-name: Prompt Analyzer
+name: prompt-analyzer
 description: Analiza Task Briefs y Phase Briefs para proveer insights, comparaciones y recomendaciones de mejora iterativa.
 compatibility: opencode
 trigger_keywords: ["analyze prompt", "improve brief", "compare briefs", "prompt insights"]

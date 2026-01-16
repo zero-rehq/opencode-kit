@@ -1,5 +1,5 @@
 ---
-name: Smart Router (Multi-Repo E2E Workflows)
+name: smart-router
 description: Config-driven routing para workflows dinámicos multi-repo. Decide automáticamente qué fases ejecutar según tipo de cambio.
 compatibility: opencode
 trigger_keywords: ["workflow", "multi-repo", "orchestration", "routing"]

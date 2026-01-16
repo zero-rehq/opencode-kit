@@ -1,5 +1,5 @@
 ---
-name: Intelligent Prompt Generator
+name: intelligent-prompt-generator
 description: Generador inteligente de Task Briefs y Phase Briefs optimizados con semantic understanding y consistency checking.
 compatibility: opencode
 trigger_keywords: ["task brief", "phase brief", "optimize prompt", "improve brief"]

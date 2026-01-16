@@ -1,5 +1,5 @@
 ---
-name: Looking Up Docs (Context7)
+name: looking-up-docs
 description: Busca documentación oficial de APIs/libraries (version-specific). Usa Context7 o WebFetch para docs reales, no inventa.
 compatibility: opencode
 trigger_keywords: ["docs", "documentation", "API reference", "how to use", "library"]

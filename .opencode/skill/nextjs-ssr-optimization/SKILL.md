@@ -1,5 +1,5 @@
 ---
-name: Next.js SSR Optimization
+name: nextjs-ssr-optimization
 description: Optimiza rendering performance para Next.js applications (SSR, SSG, ISR, streaming).
 compatibility: opencode
 ---
