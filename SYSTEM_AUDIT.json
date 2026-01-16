@@ -1,0 +1,367 @@
+{
+  "audit_date": "2026-01-16",
+  "system_version": "OpenCode Kit v8+",
+  "overall_status": "OPERATIONAL",
+  "summary": {
+    "critical": 1,
+    "warnings": 7,
+    "info": 5
+  },
+  "orchestrator": {
+    "status": "PASS",
+    "skills_defined": 5,
+    "protocol_steps": 7,
+    "permissions": "PASS",
+    "parallelization_rules": "PASS",
+    "skill_syntax": "PASS",
+    "agent_syntax": "PASS",
+    "no_anti_pattern": "PASS",
+    "contracts_definition": "PASS",
+    "contracts_validation": "PASS",
+    "builders_coordination": "PASS"
+  },
+  "skills": {
+    "total_available": 18,
+    "complete": 16,
+    "templates": 2,
+    "issues": [
+      {
+        "severity": "WARN",
+        "issue": "Count includes 2 template skills that shouldn't be counted",
+        "recommendation": "Update SKILLS_ROUTER.md to show 16 complete skills + 2 templates"
+      },
+      {
+        "severity": "WARN",
+        "issue": "Template skills not fully implemented",
+        "recommendation": "Complete implementation of nextjs-ssr-optimization and api-documentation-generator"
+      },
+      {
+        "severity": "WARN",
+        "issue": "Missing validation mechanism for skills",
+        "recommendation": "Create validate-skills.sh script"
+      },
+      {
+        "severity": "WARN",
+        "issue": "Missing skill call syntax validation",
+        "recommendation": "Add linter to validate skill({ name: \"skill-name\" }) syntax"
+      }
+    ],
+    "skills_list": [
+      {
+        "name": "domain-classifier",
+        "category": "Orchestration",
+        "status": "COMPLETE",
+        "frontmatter_valid": true
+      },
+      {
+        "name": "intelligent-prompt-generator",
+        "category": "Orchestration",
+        "status": "COMPLETE",
+        "frontmatter_valid": true
+      },
+      {
+        "name": "prompt-analyzer",
+        "category": "Orchestration",
+        "status": "COMPLETE",
+        "frontmatter_valid": true
+      },
+      {
+        "name": "prompt-master",
+        "category": "Orchestration",
+        "status": "COMPLETE",
+        "frontmatter_valid": true
+      },
+      {
+        "name": "smart-router",
+        "category": "Orchestration",
+        "status": "COMPLETE",
+        "frontmatter_valid": true
+      },
+      {
+        "name": "ui-ux-pro-max",
+        "category": "Implementation",
+        "status": "COMPLETE",
+        "frontmatter_valid": true
+      },
+      {
+        "name": "react-best-practices",
+        "category": "Implementation",
+        "status": "COMPLETE",
+        "frontmatter_valid": true
+      },
+      {
+        "name": "github-actions-automation",
+        "category": "Implementation",
+        "status": "COMPLETE",
+        "frontmatter_valid": true
+      },
+      {
+        "name": "vercel-deploy",
+        "category": "Implementation",
+        "status": "COMPLETE",
+        "frontmatter_valid": true
+      },
+      {
+        "name": "web-design-guidelines",
+        "category": "Review",
+        "status": "COMPLETE",
+        "frontmatter_valid": true
+      },
+      {
+        "name": "documentation-sync",
+        "category": "Documentation",
+        "status": "COMPLETE",
+        "frontmatter_valid": true
+      },
+      {
+        "name": "release-notes",
+        "category": "Documentation",
+        "status": "COMPLETE",
+        "frontmatter_valid": true
+      },
+      {
+        "name": "looking-up-docs",
+        "category": "Documentation",
+        "status": "COMPLETE",
+        "frontmatter_valid": true
+      },
+      {
+        "name": "prompt-generator",
+        "category": "Bridge",
+        "status": "COMPLETE",
+        "frontmatter_valid": true
+      },
+      {
+        "name": "microservices",
+        "category": "Workflow",
+        "status": "COMPLETE",
+        "frontmatter_valid": true
+      },
+      {
+        "name": "workflow-orchestration",
+        "category": "Workflow",
+        "status": "COMPLETE",
+        "frontmatter_valid": true
+      },
+      {
+        "name": "nextjs-ssr-optimization",
+        "category": "Template",
+        "status": "TEMPLATE",
+        "frontmatter_valid": true,
+        "note": "Template for new skill - detected as gap by skills-router-agent"
+      },
+      {
+        "name": "api-documentation-generator",
+        "category": "Template",
+        "status": "TEMPLATE",
+        "frontmatter_valid": true,
+        "note": "Template for new skill - detected as gap by skills-router-agent"
+      }
+    ]
+  },
+  "subagents": {
+    "total": 8,
+    "frontmatter_valid": true,
+    "permissions_valid": true,
+    "skill_access": true,
+    "no_anti_pattern": true,
+    "agents_list": [
+      {
+        "name": "orchestrator",
+        "mode": "primary",
+        "model": "zai-coding-plan/glm-4.7",
+        "temperature": 0.1,
+        "has_skill_access": true,
+        "has_edit_permission": false,
+        "has_bash_permission": false
+      },
+      {
+        "name": "builder",
+        "mode": "subagent",
+        "model": "zai-coding-plan/glm-4.7",
+        "temperature": 0.2,
+        "has_skill_access": true,
+        "has_edit_permission": true,
+        "has_bash_permission": true
+      },
+      {
+        "name": "reviewer",
+        "mode": "subagent",
+        "model": "zai-coding-plan/glm-4.7",
+        "temperature": 0.1,
+        "has_skill_access": true,
+        "has_edit_permission": false,
+        "has_bash_permission": false
+      },
+      {
+        "name": "scribe",
+        "mode": "subagent",
+        "model": "zai-coding-plan/glm-4.7",
+        "temperature": 0.2,
+        "has_skill_access": true,
+        "has_edit_permission": false,
+        "has_bash_permission": false
+      },
+      {
+        "name": "skills-router-agent",
+        "mode": "subagent",
+        "model": "zai-coding-plan/glm-4.7",
+        "temperature": 0.2,
+        "has_skill_access": true,
+        "has_edit_permission": false,
+        "has_bash_permission": false
+      },
+      {
+        "name": "repo-scout",
+        "mode": "subagent",
+        "model": "zai-coding-plan/glm-4.7",
+        "temperature": 0.2,
+        "has_skill_access": true,
+        "has_edit_permission": false,
+        "has_bash_permission": false
+      },
+      {
+        "name": "contract-keeper",
+        "mode": "subagent",
+        "model": "zai-coding-plan/glm-4.7",
+        "temperature": 0.1,
+        "has_skill_access": true,
+        "has_edit_permission": false,
+        "has_bash_permission": false
+      },
+      {
+        "name": "docs-specialist",
+        "mode": "subagent",
+        "model": "zai-coding-plan/glm-4.7",
+        "temperature": 0.2,
+        "has_skill_access": true,
+        "has_edit_permission": true,
+        "has_bash_permission": false
+      },
+      {
+        "name": "bootstrap-scout",
+        "mode": "subagent",
+        "model": "zai-coding-plan/glm-4.7",
+        "temperature": 0.2,
+        "has_skill_access": true,
+        "has_edit_permission": true,
+        "has_bash_permission": false
+      },
+      {
+        "name": "integration-builder",
+        "mode": "subagent",
+        "model": "zai-coding-plan/glm-4.7",
+        "temperature": 0.2,
+        "has_skill_access": true,
+        "has_edit_permission": true,
+        "has_bash_permission": true
+      }
+    ]
+  },
+  "commands": {
+    "opencode_json_exists": false,
+    "expected_location": "/home/bruno/FarmaconnectTicson/opencode-kit/opencode.json",
+    "status": "CRITICAL",
+    "recommendation": "Create opencode.json with command configuration"
+  },
+  "routing": {
+    "orchestrator_uses_skills_before_delegating": true,
+    "orchestrator_calls_agents_directly": true,
+    "agents_receive_skills_reports": true,
+    "n_builders_in_one_message": true,
+    "contract_keeper_defines_before_implement": true,
+    "contract_keeper_validates_after_implement": true,
+    "reviewer_waits_for_all_builders": true,
+    "status": "PASS"
+  },
+  "plugins": {
+    "directory_exists": false,
+    "plugins_defined": 0,
+    "status": "INFO",
+    "recommendation": "Not needed currently, can be considered in future"
+  },
+  "templates": {
+    "status": "PASS",
+    "templates_exist": [
+      "task-brief.md",
+      "phase-brief.md",
+      "gate-request.md",
+      "view-decision.md"
+    ]
+  },
+  "support_files": {
+    "skills_router_md": "PASS",
+    "agents_md": "PASS",
+    "status": "PASS"
+  },
+  "recommendations": {
+    "critical": [
+      {
+        "id": "create-opencode-json",
+        "description": "Create opencode.json with command configuration",
+        "priority": "IMMEDIATE"
+      }
+    ],
+    "high": [
+      {
+        "id": "update-skills-count",
+        "description": "Update SKILLS_ROUTER.md to show 16 complete skills + 2 templates",
+        "priority": "1-3 days"
+      },
+      {
+        "id": "complete-template-skills",
+        "description": "Complete implementation of nextjs-ssr-optimization and api-documentation-generator",
+        "priority": "1-3 days"
+      },
+      {
+        "id": "create-validation-scripts",
+        "description": "Create validate-skills.sh, validate-agents.sh, validate-permissions.sh",
+        "priority": "1-3 days"
+      }
+    ],
+    "medium": [
+      {
+        "id": "document-commands",
+        "description": "Create .opencode/COMMANDS.md with all system commands",
+        "priority": "1-2 weeks"
+      },
+      {
+        "id": "create-missing-scripts",
+        "description": "Create missing scripts for github-actions-automation, vercel-deploy, release-notes",
+        "priority": "1-2 weeks"
+      },
+      {
+        "id": "improve-logging",
+        "description": "Add structured logging for each workflow phase",
+        "priority": "1-2 weeks"
+      },
+      {
+        "id": "add-integration-tests",
+        "description": "Add integration tests for Orchestrator workflow",
+        "priority": "1-2 weeks"
+      }
+    ],
+    "low": [
+      {
+        "id": "consider-plugins",
+        "description": "Consider .opencode/plugin/ for future modularity",
+        "priority": "1+ month"
+      },
+      {
+        "id": "improve-gap-documentation",
+        "description": "Improve documentation of gaps in SKILLS_ROUTER.md",
+        "priority": "1+ month"
+      },
+      {
+        "id": "add-usage-examples",
+        "description": "Add more usage examples in skills",
+        "priority": "1+ month"
+      },
+      {
+        "id": "external-integrations",
+        "description": "Consider integrations with GitHub Actions, Jira, etc.",
+        "priority": "1+ month"
+      }
+    ]
+  }
+}

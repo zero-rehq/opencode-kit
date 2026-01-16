@@ -1,5 +1,13 @@
 # Skills Router - Central Index
 
+## Skills Disponibles
+
+- **Skills Completas**: 16 (índices 0-15)
+- **Skills Templates**: 2 (nextjs-ssr-optimization, api-documentation-generator)
+- **Total Directorios**: 18
+
+**Nota**: Las skills templates tienen una estructura básica pero faltan scripts y ejemplos completos. Se consideran plantillas para futura implementación.
+
 ## Skills Index por Categoría
 
 ### Orchestration & Routing
@@ -32,6 +40,17 @@
 | **documentation-sync** | docs, drift, sync, outdated | MEDIUM | No |
 | **release-notes** | release, changelog, version | MEDIUM | No |
 | **looking-up-docs** | docs, API reference, how to use | LOW | No |
+
+### Skills Templates (Status: Pendiente de Implementación Completa)
+
+Las siguientes skills están marcadas como "template" y necesitan implementación completa:
+
+| Skill | Estado | Falta |
+|-------|--------|-------|
+| **nextjs-ssr-optimization** | Template (checklist only) | Scripts de análisis SSR, reglas específicas, workflows de migración |
+| **api-documentation-generator** | Template (description only) | Scripts de análisis de código, integración con parsers, generación de clientes |
+
+**Nota**: Estas skills fueron detectadas como gaps por el skills-router-agent y necesitan scripts/ejemplos completos para ser usables.
 
 ## Routing Rules Globales
 
