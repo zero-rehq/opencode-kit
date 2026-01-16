@@ -1,7 +1,7 @@
 ---
 description: "Trazabilidad: changelog + nota para Jira (sin tocar código)."
 mode: subagent
-model: opencode/glm-4.7-free
+model: zai-coding-plan/glm-4.7
 temperature: 0.2
 permission:
   edit: deny

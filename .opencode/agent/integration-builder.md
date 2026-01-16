@@ -1,7 +1,7 @@
 ---
 description: "Integration builder: coordina cambios en 3+ repos con dependencias circulares"
 mode: subagent
-model: opencode/claude-sonnet-4-5
+model: zai-coding-plan/glm-4.7
 temperature: 0.2
 permission:
   edit: allow

@@ -1,7 +1,7 @@
 ---
 description: "Skills routing specialist: analiza tasks, revisa repo-scouts y genera recomendaciones de skills"
 mode: subagent
-model: opencode/claude-sonnet-4-5
+model: zai-coding-plan/glm-4.7
 temperature: 0.2
 permission:
   edit: deny

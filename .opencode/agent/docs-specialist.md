@@ -1,7 +1,7 @@
 ---
 description: "Docs specialist: detecta drift entre código y docs, mantiene READMEs alineados"
 mode: subagent
-model: opencode/claude-sonnet-4-5
+model: zai-coding-plan/glm-4.7
 temperature: 0.2
 permission:
   edit: allow

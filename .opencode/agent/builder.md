@@ -1,7 +1,7 @@
 ---
 description: "Implementa cambios multi-repo y ejecuta quality gates. Entrega E2E_TRACE + evidencia."
 mode: subagent
-model: opencode/glm-4.7-free
+model: zai-coding-plan/glm-4.7
 temperature: 0.2
 permission:
   edit: allow

@@ -1,7 +1,7 @@
 ---
 description: "Revisión dura: valida E2E_TRACE, no-any, gates, coherencia y calidad. Decide PASS/FAIL."
 mode: subagent
-model: opencode/gpt-5.2-codex
+model: zai-coding-plan/glm-4.7
 temperature: 0.1
 permission:
   edit: deny

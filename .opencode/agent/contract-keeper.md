@@ -1,7 +1,7 @@
 ---
 description: "Contract validator: valida DTOs/endpoints/eventos cross-repo (READ-ONLY)"
 mode: subagent
-model: opencode/claude-sonnet-4-5
+model: zai-coding-plan/glm-4.7
 temperature: 0.1
 permission:
   edit: deny

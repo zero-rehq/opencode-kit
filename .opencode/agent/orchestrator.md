@@ -1,7 +1,7 @@
 ---
 description: "Router + gatekeeper: delega a subagentes y autoriza avance por fases"
 mode: primary
-model: opencode/claude-sonnet-4-5
+model: zai-coding-plan/glm-4.7
 temperature: 0.1
 permission:
   edit: deny
