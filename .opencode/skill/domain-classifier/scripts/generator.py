@@ -1,1 +1,1 @@
-/home/bruno/FarmaconnectTicson/opencode-kit/docs/references/repos/skill-prompt-generator/intelligent_generator.py
+../../../../docs/references/repos/skill-prompt-generator/intelligent_generator.py

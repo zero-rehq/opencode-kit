@@ -1,1 +1,1 @@
-/home/bruno/FarmaconnectTicson/opencode-kit/docs/references/repos/skill-prompt-generator/framework_loader.py
+../../../../docs/references/repos/skill-prompt-generator/framework_loader.py

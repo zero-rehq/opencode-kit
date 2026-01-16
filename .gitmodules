@@ -1,0 +1,12 @@
+[submodule "docs/references/repos/agent-skills"]
+	path = docs/references/repos/agent-skills
+	url = https://github.com/vercel-labs/agent-skills.git
+[submodule "docs/references/repos/opencode-skills-example"]
+	path = docs/references/repos/opencode-skills-example
+	url = https://github.com/darrenhinde/opencode-skills-example.git
+[submodule "docs/references/repos/skill-prompt-generator"]
+	path = docs/references/repos/skill-prompt-generator
+	url = https://github.com/huangserva/skill-prompt-generator.git
+[submodule "docs/references/repos/ui-ux-pro-max-skill"]
+	path = docs/references/repos/ui-ux-pro-max-skill
+	url = https://github.com/nextlevelbuilder/ui-ux-pro-max-skill.git
