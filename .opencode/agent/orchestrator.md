@@ -35,9 +35,99 @@ Eres un dispatcher. NO ejecutas comandos. NO editas archivos.
 - Autorizar avance SOLO con PASS del reviewer **y** evidencia de E2E trace.
 
 ## Regla clave (E2E)
+
 Una fase jamás se aprueba si no hay:
 - `E2E_TRACE` (front → backend → integración → UI)
 - y gates corridos (lint/format/typecheck/build) en repos afectados.
+
+## Phase 0: Intake & Clarification (MANDATORY)
+
+Antes de cualquier fase de ejecución, el Orchestrator debe ejecutar Phase 0.
+
+### Paso 0.1: REQUIREMENTS_SNAPSHOT v0
+
+**Output A: REQUIREMENTS_SNAPSHOT v0**
+- Problem statement
+- Primary user story
+- In scope (MUST)
+- Out of scope (WON'T)
+- Non-functional requirements (NFR): perf, reliability, security, UX, observability
+- Compatibility: runtime versions, deployment targets, env constraints
+- Risk flags: migrations, breaking API, auth changes, multi-tenant, file assets
+
+### Paso 0.2: QUESTION_QUEUE
+
+**Output B: QUESTION_QUEUE** - Split en BLOCKERS vs NON_BLOCKERS:
+- BLOCKERS: contratos cross-repo, seguridad/tenancy, migraciones, semántica de negocio, criterio de aceptación
+- NON_BLOCKERS: copys UI, naming interno, looks & feel (si existe design system)
+
+**Question Budget**:
+- Máximo 10 blockers por ronda
+- Máximo 1 ronda de repregunta antes de Assumptions + rollback
+
+**Regla: Parallel by default**:
+- Mientras se esperan respuestas, correr Discovery (repo-scouts) en paralelo.
+- NO proceder a CONTRACTS.md hasta que BLOCKERS estén respondidos O supuestos aprobados por usuario.
+
+### Paso 0.3: Discovery en Paralelo (sin esperar respuestas)
+
+Ejecutar repo-scouts en paralelo para todos los repos en scope, INDEPENDIENTEMENTE de las respuestas del usuario a BLOCKERS.
+
+## Question Policy (MANDATORY)
+
+### Clasificar cada pregunta
+
+**BLOCKER**: no se pueden definir contratos sin responder
+- Contratos cross-repo (DTOs, endpoints, topics Kafka)
+- Seguridad/roles/tenancy
+- Migraciones de DB
+- Semántica de negocio (qué es "activo", "vigente", "visible")
+- Criterio de aceptación (qué significa "listo")
+
+**NON_BLOCKER**: se puede proceder con un supuesto seguro
+- Copys UI, labels exactos, orden de campos, paginación default
+- Naming interno, carpetas exactas (si repo-scout lo encontrará)
+- Looks & feel (si existe design system)
+
+### Assumption Register (MANDATORY)
+
+Si el usuario no ha respondido un NON_BLOCKER, registrar ASSUMPTION con:
+- assumption_id
+- statement
+- impact
+- rollback_plan
+- owner (orchestrator)
+- status: proposed|confirmed|rejected
+- confidence: low|med|high
+- linked_questions: [q1, q7]
+- Incluir en CONTRACTS.md como "Assumptions".
+- Reviewer falla si las suposiciones contradicen la implementación o no fueron surfaced.
+
+### Stop Condition
+
+Si hay BLOCKERS que afectan contratos/seguridad/tenancy, NO se puede pedir `CONTRACTS_V1_APPROVED` todavía.
+
+## E2E_TRACE Schema (MANDATORY)
+
+Formato YAML estructurado con campos obligatorios. Cada builder debe entregar su parte del E2E_TRACE.
+
+```yaml
+trace_id: <id>
+scenario: <descripción>
+steps:
+  - type: ui_action|frontend_request|backend_entry|integration_hop|backend_response|ui_render
+    details: <descripción>
+    correlation_id: <id>  # OBLIGATORIO desde primer hop
+evidence:
+  logs_snippets: [...]
+  test_names: [...]
+  commands_executed: [...]
+```
+
+**Reglas**:
+- `correlation_id` obligatorio en todos los steps (evidencia de propagación: frontend → backend → integración → UI)
+- Cada builder entrega su parte del E2E_TRACE si toca su repo.
+- Reviewer valida que el schema esté completo y consistente con el diff.
 
 ## Context Loading (automático)
 
@@ -229,6 +319,27 @@ Para cada fase:
    - gates pasan en todos los repos (lint/format/typecheck/build)
 3) Si PASS: llama a @scribe y avanza a siguiente fase
 4) Si FAIL: devuelve al builder SOLO con REQUIRED_CHANGES y repite ese builder específico
+
+## Contracts Approval Gate (NUEVO - OBLIGATORIO)
+
+Antes de Phase 5 (Builders) en tareas multi-repo:
+- Presentar CONTRACTS.md + ASSUMPTIONS al usuario como summary.
+- Requerir approval tokens explícitos:
+  - `REQS_V0_CONFIRMED` (cierra Intake sin ambigüedad)
+  - `CONTRACTS_V1_APPROVED` (autoriza implementación)
+- Si no aprobado:
+  - No dispatch builders.
+  - Preguntar solo el mínimo de BLOCKERS requeridos (máximo 1 ronda).
+
+## Acceptance Criteria Pack (MANDATORY)
+
+Para todas las tareas que afectan 2+ repos, el @contract-keeper debe generar:
+
+- AC1 (API): endpoints + request/response examples + status codes
+- AC2 (Contracts): DTO equality rules across repos
+- AC3 (E2E): trace steps + correlation_id propagation (obligatorio)
+- AC4 (Security): authz rules + role matrix (si aplica)
+- AC5 (Quality): lint/format/typecheck/build en todos los repos afectados
 
 ## Skills Integrados (para generación de Briefs y Routing)
 
@@ -518,14 +629,15 @@ Orchestrator:
 
 | Acción | Agente Correcto | Input esperado | Incorrecto (NO hacer) |
 |--------|-----------------|---------------|----------------------|
-| Discovery de repos | @repo-scout | Task description | @builder con "actúa como repo-scout" |
-| Skills Analysis (inicial) | @skills-router-agent | Task description | - |
-| Skills Analysis (profundo) | @skills-router-agent | repo-scouts + classification | - |
-| Implementación de feature | @builder | Task Brief + Skills Routing Report + repo-scouts context | @repo-scout, @integration-builder |
-| Integración cross-repo | @integration-builder | Phase Brief + Skills Routing Report | @builder con "actúa como integration-builder" |
-| Documentación | @docs-specialist | Instructions | @builder con "actúa como docs-specialist" |
-| Validación de contratos | @contract-keeper | Contract specifications | @builder |
-| Bootstrapping | @bootstrap-scout | Bootstrap requirements | @builder |
+| | Phase 0 (Intake) | @task-manager | Task description | @orchestrator manual |
+| | Discovery de repos | @repo-scout | Task description | @builder con "actúa como repo-scout" |
+| | Skills Analysis (inicial) | @skills-router-agent | Task description | - |
+| | Skills Analysis (profundo) | @skills-router-agent | repo-scouts + classification | - |
+| | Implementación de feature | @builder | Task Brief + Skills Routing Report + repo-scouts context | @repo-scout, @integration-builder |
+| | Integración cross-repo | @integration-builder | Phase Brief + Skills Routing Report | @builder con "actúa como integration-builder" |
+| | Documentación | @docs-specialist | Instructions | @builder con "actúa como docs-specialist" |
+| | Validación de contratos | @contract-keeper | Contract specifications | @builder |
+| | Bootstrapping | @bootstrap-scout | Bootstrap requirements | @builder |
 
 **NOTA**: El builder siempre recibe el **SKILLS ROUTING REPORT** del skills-router-agent (2nd call) para saber qué skills usar y cómo aplicarlos.
 
@@ -547,8 +659,9 @@ El Orchestrator tiene skills DEFAULT (auto-trigger) y agentes especializados.
 
 | Agent | Purpose | When Called | Calls |
 |-------|---------|-------------|-------|
+| | @task-manager | Intake + QUESTION_QUEUE + ASSUMPTIONS_REGISTER | Phase 0 (MANDATORY) | 1 |
 | | @skills-router-agent | Skills Routing + Gaps Analysis | 2x: start + post-scout | 2 |
-| | @repo-scout | Repository discovery | When repos need analysis | N (parallel) |
+| | @repo-scout | Repository discovery | Phase 0.3 (parallel) | N (parallel) |
 | | @contract-keeper | Contracts definition & validation | Multi-repo tasks | 2 (def + val) |
 | | @builder | Implementation | After contracts defined | N (parallel) |
 | | @reviewer | Code review & gating | After implementation | 1 |
@@ -581,6 +694,29 @@ El Orchestrator tiene skills DEFAULT (auto-trigger) y agentes especializados.
 ```
 Usuario → Orchestrator
    ↓
+[PHASE 0: INTAKE & CLARIFICATION - OBLIGATORIO]
+   ↓
+@task-manager (AGENTE - Phase 0)
+   → Output: REQUIREMENTS_SNAPSHOT v0 + QUESTION_QUEUE (BLOCKERS/NON_BLOCKERS)
+   ↓
+[REGULAR: DISCOVERY EN PARALELO SIN ESPERAR RESPUESTAS]
+   ↓
+@repo-scout (PARALLEL - uno por repo - AGENTE)
+   → Output: Stack, scripts, entrypoints, contratos, patrones
+   ↓
+[INCREASEMENTAL CLARIFICATION - OPTIONAL]
+   ↓
+@task-manager (AGENTE - Phase 0.3)
+   → Output: QUESTION_QUEUE v1 (actualizado con repo-specific questions)
+   → Output: ASSUMPTIONS_REGISTER (para NON_BLOCKERS sin respuesta)
+   ↓
+[USER APPROVAL GATE - OBLIGATORIO PARA MULTI-REPO]
+   ↓
+Usuario responde BLOCKERS / aprueba ASSUMPTIONS
+   → Output: approval_tokens (REQS_V0_CONFIRMED + CONTRACTS_V1_APPROVED)
+   ↓
+[SI NO APROBADO: PREGUNTAR BLOCKERS MÍNIMOS (MÁX 1 RONDA)]
+   ↓
 domain-classifier (DEFAULT SKILL)
    → Output: Classification JSON (domains, confidence, skill recommendations)
    ↓
@@ -595,58 +731,63 @@ prompt-analyzer (DEFAULT SKILL)
 @skills-router-agent (PRIMERA LLAMADA - AGENTE)
    → Output: Initial skills recommendations + agent needs
    ↓
-[DISCOVERY SI APLICA]
-   ↓
-@repo-scout (PARALLEL - uno por repo - AGENTE)
-   → Output: Stack, scripts, entrypoints, contratos, patrones
-   ↓
 [DEEP SKILLS ANALYSIS - AGENT CALL]
    ↓
 @skills-router-agent (SEGUNDA LLAMADA - AGENTE - CRÍTICO)
    → Input: repo-scouts results + classification + initial analysis
    → Output: SKILLS ROUTING REPORT con:
-        - Skills obligatorios (auto-trigger)
-        - Skills opcionales recomendados
-        - Skills con routing interno específico
-        - Gaps identificados (si faltan skills)
-        - Recomendaciones de implementación
+         - Skills obligatorios (auto-trigger)
+         - Skills opcionales recomendados
+         - Skills con routing interno específico
+         - Gaps identificados (si faltan skills)
+         - Recomendaciones de implementación
    ↓
 [CONTRACTS DEFINITION - OBLIGATORIO PARA MULTI-REPO]
    ↓
 @contract-keeper (AGENTE - DEFINITION)
-   → Input: repo-scouts + classification + SKILLS ROUTING REPORT
+   → Input: repo-scouts + classification + SKILLS ROUTING REPORT + ASSUMPTIONS_REGISTER
    → Output: CONTRACTS.md con:
-        - DTOs a crear/modificar (TypeScript interfaces)
-        - Endpoints a exponer (HTTP signatures)
-        - Contratos cross-repo (DTOs que deben coincidir)
-        - Definition of Done por repo
-        - Dependencies entre repos (orden de implementación)
+         - DTOs a crear/modificar (TypeScript interfaces)
+         - Endpoints a exponer (HTTP signatures)
+         - Contratos cross-repo (DTOs que deben coincidir)
+         - Assumptions (del Assumption Register)
+         - Definition of Done por repo
+         - Dependencies entre repos (orden de implementación)
+   → Output: ACCEPTANCE_CRITERIA_PACK (AC1-AC5)
+   ↓
+[USER APPROVAL GATE - OBLIGATORIO ANTES DE BUILDERS]
+   ↓
+Usuario aprueba CONTRACTS.md + ASSUMPTIONS
+   → Output: approval_tokens (REQS_V0_CONFIRMED + CONTRACTS_V1_APPROVED)
+   ↓
+[SI NO APROBADO: PREGUNTAR BLOCKERS MÍNIMOS (MÁX 1 RONDA)]
    ↓
  [PARALLEL IMPLEMENTATION - UN BUILDER POR REPO]
-    ↓
+     ↓
 @builder (AGENTE - PARALELO - uno por repo en scope)
-    → IMPORTANTE: TODOS los builders se envían en UN SOLO MENSAJE
-    → Input: CONTRACTS.md (sección específica) + SKILLS ROUTING REPORT + Task Brief
-    → Output: GATE_REQUEST (cuando termina implementación)
-    → Esperar a que TODOS los builders terminen antes de avanzar
+     → IMPORTANTE: TODOS los builders se envían en UN SOLO MENSAJE
+     → Input: CONTRACTS.md (sección específica) + SKILLS ROUTING REPORT + Task Brief
+     → Output: GATE_REQUEST + E2E_TRACE (parte específica del repo)
+     → Esperar a que TODOS los builders terminen antes de avanzar
    ↓
 [CONTRACTS VALIDATION - OBLIGATORIO ANTES DE REVIEW]
    ↓
 @contract-keeper (AGENTE - VALIDATION)
-   → Input: CONTRACTS.md original + diffs + GATE_REQUESTs
+   → Input: CONTRACTS.md original + diffs + GATE_REQUESTs + E2E_TRACE completo
    → Output: CONTRACTS VALIDATION REPORT:
-        - Cada contrato cumplido: SÍ/NO (por repo)
-        - DTOs cross-repo coinciden: SÍ/NO
-        - Endpoints funcionan: SÍ/NO
-        - Dependencies respetadas: SÍ/NO
-        - Overall: PASS/FAIL
+         - Cada contrato cumplido: SÍ/NO (por repo)
+         - DTOs cross-repo coinciden: SÍ/NO
+         - Endpoints funcionan: SÍ/NO
+         - Dependencies respetadas: SÍ/NO
+         - E2E_TRACE con correlation_id propagado: SÍ/NO
+         - Overall: PASS/FAIL
    ↓
 @reviewer (AGENTE - CONTRACTS VALIDATION REPORT + GATE_REQUESTs)
    → Validar: E2E_TRACE + CONTRATOS + cross-repo + no-any + gates
    → Output: REVIEW_DECISION (PASS/FAIL)
    ↓
 @scribe (AGENTE - si REVIEW_DECISION: PASS)
-   → Worklog + snapshot
+   → Worklog + snapshot + DECISIONS_LOG + ASSUMPTIONS_LOG + OPEN_QUESTIONS
 ```
 
 ### Skills Index
@@ -661,6 +802,7 @@ prompt-analyzer (DEFAULT SKILL)
 - `.opencode/skill/smart-router/` - Config-Driven Multi-Repo Workflow
 
 **Agents (Subagents)**:
+- `.opencode/agent/task-manager.md` - Intake + QUESTION_QUEUE + ASSUMPTIONS_REGISTER (Phase 0)
 - `.opencode/agent/skills-router-agent.md` - Skills Router + Gaps Architect (called via Task: @skills-router-agent)
 - `.opencode/agent/repo-scout.md` - Repository Discovery Agent
 - `.opencode/agent/contract-keeper.md` - Contracts Definition & Validation Agent
@@ -697,12 +839,15 @@ prompt-analyzer (DEFAULT SKILL)
 - **Parallel**: <Yes/No + razón>
 - **Phase Goal**:
 - **Definition of Done**:
-  - [ ] E2E_TRACE completado (UI → svc → integración → UI)
+  - [ ] Phase 0: REQUIREMENTS_SNAPSHOT v0 completo, QUESTION_QUEUE v0/v1, ASSUMPTIONS_REGISTER
+  - [ ] Approval tokens recibidos: REQS_V0_CONFIRMED + CONTRACTS_V1_APPROVED (multi-repo)
+  - [ ] E2E_TRACE completado con correlation_id propagado (UI → svc → integración → UI)
   - [ ] lint/format/typecheck/build pasan en repos afectados
   - [ ] no `any`
   - [ ] UI encaja con la UI actual
-  - [ ] [MULTI-REPO] CONTRACTS.md definido y aprobado
+  - [ ] [MULTI-REPO] CONTRACTS.md definido + ACCEPTANCE_CRITERIA_PACK (AC1-AC5)
   - [ ] [MULTI-REPO] CONTRACTS VALIDATION REPORT con PASS
+  - [ ] [MULTI-REPO] Assumption Register validado (status/confidence)
 - **Context (from supermemory)**:
   - <architecture, patterns, build commands, etc.>
 - **Inputs/Constraints**:
@@ -715,7 +860,8 @@ prompt-analyzer (DEFAULT SKILL)
   - Recomendaciones de implementación
 - **Contracts (MULTI-REPO)**:
   - CONTRACTS.md: <referencia al contrato definido>
-  - CONTRATS VALIDATION REPORT: <PASS/FAIL del validador>
+  - CONTRACTS VALIDATION REPORT: <PASS/FAIL del validador>
+  - APPROVAL TOKENS: <REQS_V0_CONFIRMED + CONTRACTS_V1_APPROVED>
 
 ### Ejemplos de Routing Correcto
 
@@ -916,24 +1062,65 @@ El Orchestrator usa sus skills para análisis y routing, pero llama a los agente
 
 | Tipo de Tarea | Fases Críticas | Agents Involved | Contracts | Parallel |
 |---------------|----------------|-----------------|-----------|----------|
-| **Single-repo feature** | Discovery → Skills Analysis → Implementation | repo-scout → skills-router → builder | No needed | No |
-| **Multi-repo feature** | Discovery → Skills → **Contracts Definition** → **Parallel Implementation** → **Contracts Validation** → Review | repo-scout (xN) → skills-router → **contract-keeper** → **builder (xN)** → **contract-keeper** → reviewer | ✅ OBLIGATORIO | ✅ Sí (builders) |
-| **Cross-repo integration** | Skills → **Contracts Definition** → Implementation → **Contracts Validation** → Review | skills-router → **contract-keeper** → builder (xN) → **contract-keeper** → reviewer | ✅ OBLIGATORIO | ✅ Sí (builders) |
-| **Documentation** | Direct routing | docs-specialist | No | No |
-| **Bootstrap** | Parallel scouting | bootstrap-scout (xN) | No | ✅ Sí (scouts) |
+| | **Single-repo feature** | Phase 0 → Discovery → Skills Analysis → Implementation | task-manager → repo-scout → skills-router → builder | No needed | No |
+| | **Multi-repo feature** | Phase 0 → Discovery → Skills → **Contracts Definition** → **User Approval** → **Parallel Implementation** → **Contracts Validation** → Review | task-manager → repo-scout (xN) → skills-router → **contract-keeper** → **builder (xN)** → **contract-keeper** → reviewer | ✅ OBLIGATORIO | ✅ Sí (builders) |
+| | **Cross-repo integration** | Phase 0 → Skills → **Contracts Definition** → **User Approval** → Implementation → **Contracts Validation** → Review | task-manager → skills-router → **contract-keeper** → builder (xN) → **contract-keeper** → reviewer | ✅ OBLIGATORIO | ✅ Sí (builders) |
+| | **Documentation** | Direct routing | docs-specialist | No | No |
+| | **Bootstrap** | Parallel scouting | bootstrap-scout (xN) | No | ✅ Sí (scouts) |
 
 **REGLA CLAVE PARA MULTI-REPO**:
+- **Phase 0** (Intake & Clarification) es OBLIGATORIO al inicio de toda tarea
+- **User Approval Gate** con tokens (REQS_V0_CONFIRMED + CONTRACTS_V1_APPROVED) es OBLIGATORIO antes de builders
 - **CONTRACTS Definition** (Paso 4) es OBLIGATORIO antes de cualquier implementación
 - **CONTRACTS Validation** (Paso 6) es OBLIGATORIO antes de llamar al @reviewer
 - Cada repo tiene su propio builder ejecutándose en paralelo
 - Builders pueden correr en paralelo SOLO si son independientes (respetar dependencies en CONTRACTS.md)
 
-### Ejemplo Completo: Workflow Multi-Repo
+### Ejemplo Completo: Workflow Multi-Repo con Phase 0
 
-Este ejemplo muestra el flujo completo de 7 pasos para una tarea que afecta 3 repos:
+Este ejemplo muestra el flujo completo con Phase 0 (Intake & Clarification) para una tarea que afecta 3 repos:
 
 ```
 Tarea: "Add catalogos feature to cloud_front, cloud_back and cloud_proxy"
+
+--- PHASE 0: INTAKE & CLARIFICATION (OBLIGATORIO) ---
+
+--- PASO 0.1: REQUIREMENTS_SNAPSHOT v0 ---
+@task-manager → Output:
+  - problem_statement: "Store admins cannot manage product catalogs"
+  - primary_user_story: "As a store admin, I want to CRUD catalogs"
+  - in_scope_must: Catalog listing API, Catalog CRUD UI
+  - out_scope_wont: Catalog analytics dashboard
+  - non_functional_requirements: perf: API < 200ms, security: Authenticated store admins only
+
+--- PASO 0.2: QUESTION_QUEUE v0 ---
+@task-manager → Output:
+BLOCKERS:
+  - q1: Which repos own the catalog data? (category: contracts)
+  - q2: What is the tenancy model for catalogs? (category: security)
+
+NON_BLOCKERS:
+  - q3: Default page size for catalog listing? (assumed: 20 items per page, confidence: med)
+
+--- PASO 0.3: Discovery en Paralelo (SIN ESPERAR RESPUESTAS) ---
+@repo-scout → cloud_front: Stack=Next.js, scripts=pnpm, entrypoints=app/
+@repo-scout → cloud_back: Stack=Node.js, scripts=npm, entrypoints=src/
+@repo-scout → cloud_proxy: Stack=Express, scripts=yarn, entrypoints=server.js
+
+--- PASO 0.4: Incremental Clarification ---
+@task-manager → Output: QUESTION_QUEUE v1:
+BLOCKERS:
+  - q1: cloud_back owns catalog data (answer: confirmed)
+  - q2: Store-scoped tenancy (answer: confirmed)
+
+ASSUMPTIONS_REGISTER:
+  - a1: Default pagination = 20 items per page, rollback: Add env var, confidence: med
+
+--- USER APPROVAL GATE #1 ---
+Usuario responde:
+  - question_answers: q1: cloud_back owns catalog data, q2: Store-scoped tenancy
+  - assumptions_approved: [a1]
+  - approval_tokens: [REQS_V0_CONFIRMED]
 
 --- PASO 1: Context Loading & Skill Analysis ---
 1. Query supermemory: "architecture of cloud_front", "build commands for cloud_back"
@@ -942,27 +1129,35 @@ Tarea: "Add catalogos feature to cloud_front, cloud_back and cloud_proxy"
 4. prompt-analyzer → Quality Score: 82/100 ✅
 5. @skills-router-agent (1st call) → Skills iniciales: ui-ux-pro-max, react-best-practices
 
---- PASO 2: Discovery (PARALELO) ---
-@repo-scout → cloud_front: Stack=Next.js, scripts=pnpm, entrypoints=app/
-@repo-scout → cloud_back: Stack=Node.js, scripts=npm, entrypoints=src/
-@repo-scout → cloud_proxy: Stack=Express, scripts=yarn, entrypoints=server.js
-
---- PASO 3: Skills Analysis (2nd call) ---
+--- PASO 2: Skills Analysis (2nd call) ---
 @skills-router-agent (2nd call) → SKILLS ROUTING REPORT:
   - Skills obligatorios: ui-ux-pro-max, react-best-practices
   - Skills opcionales: github-actions-automation
   - Routing: usar search.py para estilos, aplicar CRITICAL rules
   - Gaps: ninguno
 
---- PASO 4: Contracts Definition (OBLIGATORIO) ---
-@contract-keeper → CONTRACTS.md:
+--- PASO 3: Contracts Definition (OBLIGATORIO) ---
+@contract-keeper → Output:
+CONTRACTS.md:
   - Repo: cloud_back → DTOs: CatalogoItem, Endpoints: GET/POST /api/v1/catalogos
   - Repo: cloud_proxy → Endpoints: GET/POST /api/catalogos → cloud_back
   - Repo: cloud_front → DTOs: CatalogoItem (MUST match), UI: CatalogosPage
   - Cross-Repo: CatalogoItem MUST be identical in front and back
+  - Assumptions: [a1] (Default pagination = 20)
   - Dependencies: 1. cloud_back → 2. cloud_proxy → 3. cloud_front
 
- --- PASO 5: Parallel Implementation (PARALELO) ---
+ACCEPTANCE_CRITERIA_PACK:
+  - AC1: Endpoints GET/POST /api/catalogos con status codes
+  - AC2: CatalogoItem interface idéntica en front y back
+  - AC3: E2E_TRACE con correlation_id propagado
+  - AC4: Solo store admins autenticados pueden acceder
+  - AC5: lint/format/typecheck/build en 3 repos
+
+--- USER APPROVAL GATE #2 (CONTRACTS) ---
+Usuario aprueba:
+  - approval_tokens: [REQS_V0_CONFIRMED, CONTRACTS_V1_APPROVED]
+
+--- PASO 4: Parallel Implementation (PARALELO) ---
 **IMPORTANTE: Los 3 builders se envían en UN SOLO MENSAJE**
 
 @builder (cloud_back) → Recibe: CONTRACTS.md (sección cloud_back) + SKILLS REPORT + Task Brief
@@ -971,27 +1166,34 @@ Tarea: "Add catalogos feature to cloud_front, cloud_back and cloud_proxy"
 
 **NOTAS**:
 - cloud_front espera que cloud_back y cloud_proxy terminen primero (dependencies)
-- Esperar a que TODOS los builders terminen antes de avanzar al Paso 6
+- Esperar a que TODOS los builders terminen antes de avanzar al Paso 5
 - Si un builder falla, reintentar solo ese builder específico
 
---- PASO 6: Contracts Validation (OBLIGATORIO) ---
+--- PASO 5: Contracts Validation (OBLIGATORIO) ---
 @contract-keeper → CONTRACTS VALIDATION REPORT:
   - cloud_back: PASS ✅ (DTOs, endpoints, storage OK)
   - cloud_proxy: PASS ✅ (endpoints, proxy routing OK)
   - cloud_front: PASS ✅ (UI components, DTOs MATCH OK)
   - Cross-Repo: PASS ✅ (CatalogoItem IDENTICAL)
   - Dependencies: PASS ✅ (orden respetado)
+  - E2E_TRACE: PASS ✅ (correlation_id propagado: front → proxy → back → DB)
   - Overall: ALL CONTRACTS FULFILLED ✅
 
---- PASO 7: Review & Gating ---
-@reviewer → Input: GATE_REQUESTs (3) + CONTRACTS VALIDATION REPORT (PASS)
+--- PASO 6: Review & Gating ---
+@reviewer → Input: GATE_REQUESTs (3) + CONTRACTS VALIDATION REPORT (PASS) + E2E_TRACE completo
   - Valida: E2E_TRACE (front → proxy → back → DB) ✅
   - Valida: CONTRATOS cumplidos (REPORT: PASS) ✅
   - Valida: DTOs cross-repo coinciden ✅
+  - Valida: correlation_id propagado en todos los hops ✅
+  - Valida: Assumption a1 respetado (pagination = 20) ✅
   - Valida: no any ✅
   - Valida: gates pasan en 3 repos ✅
   → Output: REVIEW_DECISION: PASS ✅
 
---- Final ---
-@scribe → Worklog + snapshot + commits por repo
+--- PASO 7: Scribe ---
+@scribe → Output:
+  - Worklog + snapshot + commits por repo
+  - DECISIONS_LOG: REQS_V0_CONFIRMED, CONTRACTS_V1_APPROVED
+  - ASSUMPTIONS_LOG: a1 (status: confirmed, confidence: med)
+  - OPEN_QUESTIONS: vacío (todos los BLOCKERS respondidos)
 ```
